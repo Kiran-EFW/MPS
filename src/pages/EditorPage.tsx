@@ -31,7 +31,7 @@ const RIGHT_PANE_STORAGE_KEY = 'mindpaperscreen-right-pane';
 const LOGLINE_STORAGE_KEY = 'mindpaperscreen-logline';
 const SYNOPSIS_STORAGE_KEY = 'mindpaperscreen-synopsis';
 
-const Index = () => {
+const EditorPage = () => {
   const [activeView, setActiveView] = useState('screenplay');
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
@@ -115,4 +115,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default EditorPage;
