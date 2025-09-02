@@ -7,10 +7,22 @@ import { showSuccess } from '@/utils/toast';
 interface SidebarProps {
   onViewChange: (view: string) => void;
   scenes: string[];
+  characters: string[];
+  locations: string[];
   onSceneClick: (scene: string) => void;
+  onCharacterClick: (character: string) => void;
+  onLocationClick: (location: string) => void;
 }
 
-export const Sidebar = ({ onViewChange, scenes, onSceneClick }: SidebarProps) => {
+export const Sidebar = ({
+  onViewChange,
+  scenes,
+  characters,
+  locations,
+  onSceneClick,
+  onCharacterClick,
+  onLocationClick,
+}: SidebarProps) => {
   const sidebarItems = [
     {
       icon: FileText,
@@ -29,12 +41,12 @@ export const Sidebar = ({ onViewChange, scenes, onSceneClick }: SidebarProps) =>
     {
       icon: Users,
       label: 'Characters',
-      content: [{ name: 'JOHN (30s)' }, { name: 'JANE (30s)' }],
+      content: characters.map(character => ({ name: character })),
     },
     {
       icon: MapPin,
       label: 'Locations',
-      content: [{ name: 'COFFEE SHOP' }, { name: 'PARK' }],
+      content: locations.map(location => ({ name: location })),
     },
     {
       icon: Notebook,
@@ -51,7 +63,10 @@ export const Sidebar = ({ onViewChange, scenes, onSceneClick }: SidebarProps) =>
   const handleItemClick = (item: { name: string; view?: string }, category: string) => {
     if (category === 'Scenes') {
       onSceneClick(item.name);
-      showSuccess(`Navigated to scene`);
+    } else if (category === 'Characters') {
+      onCharacterClick(item.name);
+    } else if (category === 'Locations') {
+      onLocationClick(item.name);
     } else if (item.view) {
       onViewChange(item.view);
       showSuccess(`Switched to ${item.name}`);
@@ -60,9 +75,22 @@ export const Sidebar = ({ onViewChange, scenes, onSceneClick }: SidebarProps) =>
     }
   };
 
+  const getTooltipText = (label: string, name: string) => {
+    switch (label) {
+      case 'Scenes':
+        return 'Jump to scene';
+      case 'Characters':
+        return `Find next mention of ${name}`;
+      case 'Locations':
+        return `Find next mention of ${name}`;
+      default:
+        return `Click to load ${name}`;
+    }
+  };
+
   return (
     <aside className="w-72 p-4 border-r bg-card text-card-foreground overflow-y-auto">
-      <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes']} className="w-full">
+      <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes', 'Characters', 'Locations']} className="w-full">
         {sidebarItems.map((item) => (
           <AccordionItem value={item.label} key={item.label}>
             <AccordionTrigger>
@@ -86,7 +114,7 @@ export const Sidebar = ({ onViewChange, scenes, onSceneClick }: SidebarProps) =>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="right">
-                        <p>{item.label === 'Scenes' ? 'Jump to scene' : `Click to load ${contentItem.name}`}</p>
+                        <p>{getTooltipText(item.label, contentItem.name)}</p>
                       </TooltipContent>
                     </Tooltip>
                   </li>
