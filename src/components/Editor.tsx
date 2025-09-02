@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -13,55 +13,47 @@ interface EditorProps {
   setIsIndianFormat: (isIndian: boolean) => void;
 }
 
-export const Editor = ({
+export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   scriptContent,
   setScriptContent,
   rightPaneContent,
   setRightPaneContent,
   isIndianFormat,
   setIsIndianFormat,
-}: EditorProps) => {
+}, ref) => {
   const [format, setFormat] = useState('action');
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       const textarea = event.currentTarget;
-      // We need a slight delay to allow the newline character to be inserted before we check the line content.
       setTimeout(() => {
         const cursorPosition = textarea.selectionStart;
         const textUpToCursor = textarea.value.substring(0, cursorPosition);
         const lines = textUpToCursor.split('\n');
-        // The line before the new empty line is the one we want to check.
         const currentLine = (lines[lines.length - 2] || '').trim();
 
-        // Rule: After a Scene Heading, switch to Action
         if (currentLine.startsWith('INT.') || currentLine.startsWith('EXT.')) {
           setFormat('action');
           return;
         }
 
-        // Rule: After a Transition, switch to Scene Heading
         if (currentLine.endsWith('TO:')) {
           setFormat('scene');
           return;
         }
 
-        // Rule: After a Character, switch to Dialogue
-        // Heuristic: The line is all uppercase, not a scene heading, and not a transition.
         if (
           currentLine === currentLine.toUpperCase() &&
           currentLine.length > 0 &&
           !currentLine.startsWith('INT.') &&
           !currentLine.startsWith('EXT.') &&
           !currentLine.endsWith('TO:') &&
-          !currentLine.startsWith('(') // Avoid matching parentheticals like (V.O)
+          !currentLine.startsWith('(')
         ) {
           setFormat('dialogue');
           return;
         }
 
-        // Rule: If the line was empty (double enter), or we just finished dialogue, default to Action.
-        // This makes it easy to move from dialogue back to describing the scene.
         if (currentLine.length === 0 || format === 'dialogue' || format === 'parenthetical') {
           setFormat('action');
         }
@@ -99,6 +91,7 @@ export const Editor = ({
         {isIndianFormat ? (
           <>
             <Textarea
+              ref={ref}
               placeholder="Video cues, actions..."
               className="flex-1 resize-none text-base font-mono leading-relaxed p-4 rounded-md"
               value={scriptContent}
@@ -114,6 +107,7 @@ export const Editor = ({
           </>
         ) : (
           <Textarea
+            ref={ref}
             placeholder="Start writing your screenplay..."
             className="w-full resize-none text-base font-mono leading-relaxed p-4 rounded-md"
             value={scriptContent}
@@ -124,4 +118,4 @@ export const Editor = ({
       </div>
     </div>
   );
-};
+});

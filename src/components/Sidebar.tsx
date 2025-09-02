@@ -4,50 +4,55 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { FileText, Video, Users, MapPin, Notebook, History } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 
-const sidebarItems = [
-  {
-    icon: FileText,
-    label: 'Project Navigator',
-    content: [
-      { name: 'Untitled Screenplay', view: 'screenplay' },
-      { name: 'Logline', view: 'logline' },
-      { name: 'Synopsis', view: 'synopsis' },
-    ],
-  },
-  {
-    icon: Video,
-    label: 'Scenes',
-    content: [{ name: 'Scene 1: INT. COFFEE SHOP - DAY' }, { name: 'Scene 2: EXT. PARK - NIGHT' }],
-  },
-  {
-    icon: Users,
-    label: 'Characters',
-    content: [{ name: 'JOHN (30s)' }, { name: 'JANE (30s)' }],
-  },
-  {
-    icon: MapPin,
-    label: 'Locations',
-    content: [{ name: 'COFFEE SHOP' }, { name: 'PARK' }],
-  },
-  {
-    icon: Notebook,
-    label: 'Notes',
-    content: [{ name: 'Research on 1920s fashion' }, { name: 'Dialogue ideas' }],
-  },
-  {
-    icon: History,
-    label: 'Workflow History',
-    content: [{ name: 'Saved 2 mins ago' }, { name: 'Edited Scene 1' }],
-  },
-];
-
 interface SidebarProps {
   onViewChange: (view: string) => void;
+  scenes: string[];
+  onSceneClick: (scene: string) => void;
 }
 
-export const Sidebar = ({ onViewChange }: SidebarProps) => {
-  const handleItemClick = (item: { name: string; view?: string }) => {
-    if (item.view) {
+export const Sidebar = ({ onViewChange, scenes, onSceneClick }: SidebarProps) => {
+  const sidebarItems = [
+    {
+      icon: FileText,
+      label: 'Project Navigator',
+      content: [
+        { name: 'Untitled Screenplay', view: 'screenplay' },
+        { name: 'Logline', view: 'logline' },
+        { name: 'Synopsis', view: 'synopsis' },
+      ],
+    },
+    {
+      icon: Video,
+      label: 'Scenes',
+      content: scenes.map(scene => ({ name: scene })),
+    },
+    {
+      icon: Users,
+      label: 'Characters',
+      content: [{ name: 'JOHN (30s)' }, { name: 'JANE (30s)' }],
+    },
+    {
+      icon: MapPin,
+      label: 'Locations',
+      content: [{ name: 'COFFEE SHOP' }, { name: 'PARK' }],
+    },
+    {
+      icon: Notebook,
+      label: 'Notes',
+      content: [{ name: 'Research on 1920s fashion' }, { name: 'Dialogue ideas' }],
+    },
+    {
+      icon: History,
+      label: 'Workflow History',
+      content: [{ name: 'Saved 2 mins ago' }, { name: 'Edited Scene 1' }],
+    },
+  ];
+
+  const handleItemClick = (item: { name: string; view?: string }, category: string) => {
+    if (category === 'Scenes') {
+      onSceneClick(item.name);
+      showSuccess(`Navigated to scene`);
+    } else if (item.view) {
       onViewChange(item.view);
       showSuccess(`Switched to ${item.name}`);
     } else {
@@ -57,7 +62,7 @@ export const Sidebar = ({ onViewChange }: SidebarProps) => {
 
   return (
     <aside className="w-72 p-4 border-r bg-card text-card-foreground overflow-y-auto">
-      <Accordion type="multiple" defaultValue={['Project Navigator']} className="w-full">
+      <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes']} className="w-full">
         {sidebarItems.map((item) => (
           <AccordionItem value={item.label} key={item.label}>
             <AccordionTrigger>
@@ -75,13 +80,13 @@ export const Sidebar = ({ onViewChange }: SidebarProps) => {
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-left h-auto py-1 px-2 truncate"
-                          onClick={() => handleItemClick(contentItem)}
+                          onClick={() => handleItemClick(contentItem, item.label)}
                         >
                           {contentItem.name}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="right">
-                        <p>Click to load {contentItem.name}</p>
+                        <p>{item.label === 'Scenes' ? 'Jump to scene' : `Click to load ${contentItem.name}`}</p>
                       </TooltipContent>
                     </Tooltip>
                   </li>

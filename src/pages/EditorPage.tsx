@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { Editor } from '@/components/Editor';
@@ -7,6 +7,7 @@ import { UpgradeModal } from '@/components/UpgradeModal';
 import { showSuccess } from '@/utils/toast';
 import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
+import { parseScenes } from '@/utils/screenplay';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -24,6 +25,10 @@ Thanks. I'm stuck on this scene.
 JANE
 (Smiling)
 Writer's block? Or just procrastinating on Reddit?
+
+EXT. PARK - NIGHT
+
+A lone figure sits on a bench.
 `;
 
 const SCRIPT_STORAGE_KEY = 'mindpaperscreen-script';
@@ -41,6 +46,9 @@ const EditorPage = () => {
 
   const [isIndianFormat, setIsIndianFormat] = useState(false);
   const [lastSaved, setLastSaved] = useState(new Date());
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  const scenes = useMemo(() => parseScenes(scriptContent), [scriptContent]);
 
   useEffect(() => {
     localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent);
@@ -67,6 +75,17 @@ const EditorPage = () => {
     showSuccess('Project saved!');
   };
 
+  const handleSceneClick = (scene: string) => {
+    const textarea = editorRef.current;
+    if (textarea) {
+      const index = textarea.value.indexOf(scene);
+      if (index !== -1) {
+        textarea.focus();
+        textarea.setSelectionRange(index, index);
+      }
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       showSuccess('Project auto-saved!');
@@ -89,6 +108,7 @@ const EditorPage = () => {
       default:
         return (
           <Editor
+            ref={editorRef}
             scriptContent={scriptContent}
             setScriptContent={setScriptContent}
             rightPaneContent={rightPaneContent}
@@ -104,7 +124,7 @@ const EditorPage = () => {
     <div className="flex flex-col h-screen w-full bg-background text-foreground">
       <Header />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar onViewChange={setActiveView} />
+        <Sidebar onViewChange={setActiveView} scenes={scenes} onSceneClick={handleSceneClick} />
         <main className="flex-1 flex flex-col overflow-hidden">
           {renderActiveView()}
         </main>
