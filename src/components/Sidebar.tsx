@@ -2,6 +2,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { FileText, Video, Users, MapPin, Notebook, History } from 'lucide-react';
+import { showSuccess } from '@/utils/toast';
 
 const sidebarItems = [
   { icon: FileText, label: 'Project Navigator', content: ['Untitled Screenplay', 'Logline', 'Synopsis'] },
@@ -13,6 +14,11 @@ const sidebarItems = [
 ];
 
 export const Sidebar = () => {
+  const handleItemClick = (itemName: string) => {
+    showSuccess(`Loading ${itemName}...`);
+    // In a real app, this is where you would load the content for the selected item.
+  };
+
   return (
     <aside className="w-72 p-4 border-r bg-card text-card-foreground overflow-y-auto">
       <Accordion type="multiple" defaultValue={['Project Navigator']} className="w-full">
@@ -30,12 +36,16 @@ export const Sidebar = () => {
                   <li key={contentItem}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-start text-left h-auto py-1 px-2 truncate">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-left h-auto py-1 px-2 truncate"
+                          onClick={() => handleItemClick(contentItem)}
+                        >
                           {contentItem}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="right">
-                        <p>Click to expand details for {contentItem}</p>
+                        <p>Click to load {contentItem}</p>
                       </TooltipContent>
                     </Tooltip>
                   </li>
