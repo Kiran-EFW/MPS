@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
 export const Editor = () => {
+  const [format, setFormat] = useState('action');
+
   const screenplayPlaceholder = `INT. COFFEE SHOP - DAY
 
 Sunlight streams through the window.
@@ -25,7 +28,14 @@ Writer's block? Or just procrastinating on Reddit?
   return (
     <div className="flex-1 flex flex-col p-4 bg-background">
       <div className="flex items-center justify-between mb-4 pb-4 border-b flex-wrap gap-4">
-        <ToggleGroup type="single" defaultValue="action" className="flex-wrap justify-start">
+        <ToggleGroup
+          type="single"
+          className="flex-wrap justify-start"
+          value={format}
+          onValueChange={(value) => {
+            if (value) setFormat(value);
+          }}
+        >
           <ToggleGroupItem value="scene">Scene Heading</ToggleGroupItem>
           <ToggleGroupItem value="action">Action</ToggleGroupItem>
           <ToggleGroupItem value="character">Character</ToggleGroupItem>
@@ -37,6 +47,9 @@ Writer's block? Or just procrastinating on Reddit?
           <Label htmlFor="layout-switch">Indian Cinema Format</Label>
           <Switch id="layout-switch" />
         </div>
+      </div>
+      <div className="mb-2 text-sm text-muted-foreground">
+        Current Format: <span className="capitalize font-semibold text-foreground">{format}</span>
       </div>
       <Textarea
         placeholder="Start writing your screenplay..."
