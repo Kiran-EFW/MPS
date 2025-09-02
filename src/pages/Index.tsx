@@ -25,24 +25,40 @@ Writer's block? Or just procrastinating on Reddit?
 `;
 
 const AUTO_SAVE_INTERVAL = 60 * 1000; // 1 minute
+const SCRIPT_STORAGE_KEY = 'mindpaperscreen-script';
+const RIGHT_PANE_STORAGE_KEY = 'mindpaperscreen-right-pane';
 
 const Index = () => {
-  const [scriptContent, setScriptContent] = useState(initialScript);
-  const [rightPaneContent, setRightPaneContent] = useState('');
+  const [scriptContent, setScriptContent] = useState(() => {
+    return localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript;
+  });
+  const [rightPaneContent, setRightPaneContent] = useState(() => {
+    return localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '';
+  });
   const [isIndianFormat, setIsIndianFormat] = useState(false);
   const [lastSaved, setLastSaved] = useState(new Date());
 
+  // Save script content to local storage on change
+  useEffect(() => {
+    localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent);
+    setLastSaved(new Date());
+  }, [scriptContent]);
+
+  // Save right pane content to local storage on change
+  useEffect(() => {
+    localStorage.setItem(RIGHT_PANE_STORAGE_KEY, rightPaneContent);
+    setLastSaved(new Date());
+  }, [rightPaneContent]);
+
   const handleSave = () => {
-    // In a real app, this is where you would save the script content.
-    console.log('Saving script...');
+    // Manual save is now just for user feedback, as it saves on every keystroke.
     setLastSaved(new Date());
     showSuccess('Script saved!');
   };
 
+  // This interval is now just for periodic "auto-saved" notifications.
   useEffect(() => {
     const interval = setInterval(() => {
-      // This simulates the auto-save functionality.
-      setLastSaved(new Date());
       showSuccess('Script auto-saved!');
     }, AUTO_SAVE_INTERVAL);
 
