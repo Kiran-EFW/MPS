@@ -7,6 +7,7 @@ import { UpgradeModal } from '@/components/UpgradeModal';
 import { showSuccess, showError } from '@/utils/toast';
 import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
+import { TitlePageEditor, TitlePageContent } from '@/components/TitlePageEditor';
 import { parseScenes, parseCharacters, parseLocations } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
@@ -43,18 +44,28 @@ const SCRIPT_STORAGE_KEY = 'mindpaperscreen-script';
 const RIGHT_PANE_STORAGE_KEY = 'mindpaperscreen-right-pane';
 const LOGLINE_STORAGE_KEY = 'mindpaperscreen-logline';
 const SYNOPSIS_STORAGE_KEY = 'mindpaperscreen-synopsis';
+const TITLE_PAGE_STORAGE_KEY = 'mindpaperscreen-titlepage';
+
+interface PrintData {
+  script: string;
+  titlePage: TitlePageContent;
+}
 
 const EditorPage = () => {
-  const [activeView, setActiveView] = useState('screenplay');
+  const [activeView, setActiveView] = useState('titlepage');
   const [isFindOpen, setIsFindOpen] = useState(false);
   const isMobile = useIsMobile();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [scriptToPrint, setScriptToPrint] = useState<string | null>(null);
+  const [dataToPrint, setDataToPrint] = useState<PrintData | null>(null);
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
   const [loglineContent, setLoglineContent] = useState(() => localStorage.getItem(LOGLINE_STORAGE_KEY) || '');
   const [synopsisContent, setSynopsisContent] = useState(() => localStorage.getItem(SYNOPSIS_STORAGE_KEY) || '');
+  const [titlePageContent, setTitlePageContent] = useState<TitlePageContent>(() => {
+    const saved = localStorage.getItem(TITLE_PAGE_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : { title: '', author: '', contact: '' };
+  });
 
   const [isIndianFormat, setIsIndianFormat] = useState(false);
   const [lastSaved, setLastSaved] = useState(new Date());
@@ -65,31 +76,17 @@ const EditorPage = () => {
   const locations = useMemo(() => parseLocations(scriptContent), [scriptContent]);
 
   useEffect(() => {
-    if (scriptToPrint !== null) {
+    if (dataToPrint !== null) {
       window.print();
-      setScriptToPrint(null);
+      setDataToPrint(null);
     }
-  }, [scriptToPrint]);
+  }, [dataToPrint]);
 
-  useEffect(() => {
-    localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent);
-    setLastSaved(new Date());
-  }, [scriptContent]);
-
-  useEffect(() => {
-    localStorage.setItem(RIGHT_PANE_STORAGE_KEY, rightPaneContent);
-    setLastSaved(new Date());
-  }, [rightPaneContent]);
-
-  useEffect(() => {
-    localStorage.setItem(LOGLINE_STORAGE_KEY, loglineContent);
-    setLastSaved(new Date());
-  }, [loglineContent]);
-
-  useEffect(() => {
-    localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent);
-    setLastSaved(new Date());
-  }, [synopsisContent]);
+  useEffect(() => { localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent); setLastSaved(new Date()); }, [scriptContent]);
+  useEffect(() => { localStorage.setItem(RIGHT_PANE_STORAGE_KEY, rightPaneContent); setLastSaved(new Date()); }, [rightPaneContent]);
+  useEffect(() => { localStorage.setItem(LOGLINE_STORAGE_KEY, loglineContent); setLastSaved(new Date()); }, [loglineContent]);
+  useEffect(() => { localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent); setLastSaved(new Date()); }, [synopsisContent]);
+  useEffect(() => { localStorage.setItem(TITLE_PAGE_STORAGE_KEY, JSON.stringify(titlePageContent)); setLastSaved(new Date()); }, [titlePageContent]);
 
   const handleSave = () => {
     setLastSaved(new Date());
@@ -101,10 +98,7 @@ const EditorPage = () => {
     if (textarea) {
       const currentPosition = textarea.selectionStart;
       let index = textarea.value.indexOf(searchTerm, currentPosition + 1);
-      if (index === -1) {
-        index = textarea.value.indexOf(searchTerm);
-      }
-
+      if (index === -1) { index = textarea.value.indexOf(searchTerm); }
       if (index !== -1) {
         textarea.focus();
         textarea.setSelectionRange(index, index + searchTerm.length);
@@ -130,14 +124,9 @@ const EditorPage = () => {
   const findNext = (find: string) => {
     const textarea = editorRef.current;
     if (!textarea || !find) return;
-    
     const currentPosition = textarea.selectionEnd;
     let index = scriptContent.indexOf(find, currentPosition);
-    
-    if (index === -1) {
-      index = scriptContent.indexOf(find);
-    }
-  
+    if (index === -1) { index = scriptContent.indexOf(find); }
     if (index !== -1) {
       textarea.focus();
       textarea.setSelectionRange(index, index + find.length);
@@ -149,14 +138,11 @@ const EditorPage = () => {
   const replace = (find: string, replace: string) => {
     const textarea = editorRef.current;
     if (!textarea || !find) return;
-  
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    
     if (scriptContent.substring(start, end).toLowerCase() === find.toLowerCase()) {
       const newContent = scriptContent.substring(0, start) + replace + scriptContent.substring(end);
       setScriptContent(newContent);
-      
       setTimeout(() => {
         const nextTextarea = editorRef.current;
         if (nextTextarea) {
@@ -178,10 +164,7 @@ const EditorPage = () => {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      showSuccess('Project auto-saved!');
-    }, 60 * 1000);
-
+    const interval = setInterval(() => { showSuccess('Project auto-saved!'); }, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -191,6 +174,8 @@ const EditorPage = () => {
 
   const renderActiveView = () => {
     switch (activeView) {
+      case 'titlepage':
+        return <TitlePageEditor content={titlePageContent} setContent={setTitlePageContent} />;
       case 'logline':
         return <LoglineEditor content={loglineContent} setContent={setLoglineContent} />;
       case 'synopsis':
@@ -230,7 +215,7 @@ const EditorPage = () => {
         <Header
           onFindClick={() => setIsFindOpen(true)}
           onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
-          onPrint={() => setScriptToPrint(scriptContent)}
+          onPrint={() => setDataToPrint({ script: scriptContent, titlePage: titlePageContent })}
         />
         <div className="flex-1 flex overflow-hidden">
           {isMobile ? (
@@ -267,7 +252,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {scriptToPrint && <PrintPreview script={scriptToPrint} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
       </div>
     </>
   );

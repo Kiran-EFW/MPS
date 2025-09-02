@@ -111,6 +111,34 @@
       font-family: 'Courier New', Courier, monospace;
       font-size: 12pt;
       line-height: 1.5;
+    }
+    .print-title-page {
+      height: 11in;
+      padding: 1in 1in 1in 1.5in;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .print-title-content {
+      text-align: center;
+      padding-top: 3in;
+    }
+    .print-title {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 1em;
+    }
+    .print-author {
+      margin-bottom: 1em;
+    }
+    .print-contact {
+      padding-bottom: 0.5in;
+    }
+    .print-contact p {
+      margin: 0;
+    }
+    #print-area > div:not(.print-title-page) {
       padding: 1in 1in 1in 1.5in;
     }
     .print-scene {

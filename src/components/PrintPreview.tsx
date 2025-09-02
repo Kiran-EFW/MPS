@@ -1,15 +1,29 @@
 import React from 'react';
 import { parseScript } from '@/utils/parser';
+import { TitlePageContent } from './TitlePageEditor';
 
 interface PrintPreviewProps {
   script: string;
+  titlePage: TitlePageContent;
 }
 
-export const PrintPreview = ({ script }: PrintPreviewProps) => {
+export const PrintPreview = ({ script, titlePage }: PrintPreviewProps) => {
   const parsedScript = parseScript(script);
 
   return (
     <div id="print-area">
+      <div className="print-title-page">
+        <div className="print-title-content">
+          <h1 className="print-title">{titlePage.title || 'Untitled Screenplay'}</h1>
+          <p className="print-author">by</p>
+          <p className="print-author">{titlePage.author || 'Unknown Author'}</p>
+        </div>
+        <div className="print-contact">
+          {titlePage.contact.split('\n').map((line, i) => (
+            <p key={i}>{line}</p>
+          ))}
+        </div>
+      </div>
       {parsedScript.map((line, index) => {
         const className = `print-${line.type}`;
         if (line.type === 'empty') {

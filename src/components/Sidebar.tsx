@@ -30,6 +30,7 @@ export const Sidebar = ({
       icon: FileText,
       label: 'Project Navigator',
       content: [
+        { name: 'Title Page', view: 'titlepage' },
         { name: 'Untitled Screenplay', view: 'screenplay' },
         { name: 'Logline', view: 'logline' },
         { name: 'Synopsis', view: 'synopsis' },
