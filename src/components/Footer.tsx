@@ -1,4 +1,4 @@
-import { Save, Clock } from 'lucide-react';
+import { Save, Clock, Film } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -11,11 +11,17 @@ interface FooterProps {
 }
 
 export const Footer = ({ wordCount, pageCount, lastSaved, onSave }: FooterProps) => {
+  const screenTime = pageCount; // 1 page ≈ 1 minute of screen time
+
   return (
     <footer className="flex items-center justify-between p-2 border-t bg-card text-card-foreground text-sm flex-wrap gap-2">
       <div className="flex items-center gap-4 flex-wrap">
         <span>Page: {pageCount}/10</span>
         <span>Words: {wordCount}</span>
+        <span className="flex items-center gap-1">
+          <Film className="h-4 w-4" />
+          <span>~{screenTime} min screen time</span>
+        </span>
         <Badge variant="destructive">10-page limit for free users</Badge>
       </div>
       <div className="flex items-center gap-4 flex-wrap justify-end">
