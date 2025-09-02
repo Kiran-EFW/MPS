@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,35 +9,37 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
-export interface FindAndReplaceActions {
-  onFindNext: (find: string) => void;
-  onReplace: (find: string, replace: string) => void;
-  onReplaceAll: (find: string, replace: string) => void;
-}
-
-interface FindAndReplaceDialogProps extends FindAndReplaceActions {
+interface FindAndReplaceDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  findValue: string;
+  setFindValue: (value: string) => void;
+  replaceValue: string;
+  setReplaceValue: (value: string) => void;
+  caseSensitive: boolean;
+  setCaseSensitive: (value: boolean) => void;
+  matchCount: number;
+  onFindNext: () => void;
+  onReplace: () => void;
+  onReplaceAll: () => void;
 }
 
 export const FindAndReplaceDialog = ({
   isOpen,
   onClose,
+  findValue,
+  setFindValue,
+  replaceValue,
+  setReplaceValue,
+  caseSensitive,
+  setCaseSensitive,
+  matchCount,
   onFindNext,
   onReplace,
   onReplaceAll,
 }: FindAndReplaceDialogProps) => {
-  const [findValue, setFindValue] = useState('');
-  const [replaceValue, setReplaceValue] = useState('');
-
-  useEffect(() => {
-    if (!isOpen) {
-      setFindValue('');
-      setReplaceValue('');
-    }
-  }, [isOpen]);
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -71,17 +72,30 @@ export const FindAndReplaceDialog = ({
               className="col-span-3"
             />
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="case-sensitive"
+              checked={caseSensitive}
+              onCheckedChange={(checked) => setCaseSensitive(Boolean(checked))}
+            />
+            <Label htmlFor="case-sensitive" className="font-normal">
+              Case sensitive
+            </Label>
+          </div>
+          {findValue && (
+            <p className="text-sm text-muted-foreground">
+              {matchCount} {matchCount === 1 ? 'match' : 'matches'} found.
+            </p>
+          )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onFindNext(findValue)}>
+          <Button variant="outline" onClick={onFindNext}>
             Find Next
           </Button>
-          <Button variant="outline" onClick={() => onReplace(findValue, replaceValue)}>
+          <Button variant="outline" onClick={onReplace}>
             Replace
           </Button>
-          <Button onClick={() => onReplaceAll(findValue, replaceValue)}>
-            Replace All
-          </Button>
+          <Button onClick={onReplaceAll}>Replace All</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

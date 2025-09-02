@@ -74,6 +74,12 @@ const EditorPage = () => {
   const [lastSaved, setLastSaved] = useState(new Date());
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
+  // State for Find and Replace
+  const [findValue, setFindValue] = useState('');
+  const [replaceValue, setReplaceValue] = useState('');
+  const [caseSensitive, setCaseSensitive] = useState(false);
+  const [matchCount, setMatchCount] = useState(0);
+
   const scenes = useMemo(() => parseScenes(scriptContent), [scriptContent]);
   const characters = useMemo(() => parseCharacters(scriptContent), [scriptContent]);
   const locations = useMemo(() => parseLocations(scriptContent), [scriptContent]);
@@ -92,6 +98,19 @@ const EditorPage = () => {
   useEffect(() => { localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent); setLastSaved(new Date()); }, [synopsisContent]);
   useEffect(() => { localStorage.setItem(TITLE_PAGE_STORAGE_KEY, JSON.stringify(titlePageContent)); setLastSaved(new Date()); }, [titlePageContent]);
   useEffect(() => { localStorage.setItem(NOTES_STORAGE_KEY, notesContent); setLastSaved(new Date()); }, [notesContent]);
+
+  // Calculate match count for Find and Replace
+  useEffect(() => {
+    if (!findValue) {
+      setMatchCount(0);
+      return;
+    }
+    const flags = caseSensitive ? 'g' : 'gi';
+    const escapedFindValue = findValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedFindValue, flags);
+    const matches = scriptContent.match(regex);
+    setMatchCount(matches ? matches.length : 0);
+  }, [findValue, caseSensitive, scriptContent]);
 
   const handleSave = () => {
     setLastSaved(new Date());
@@ -126,45 +145,53 @@ const EditorPage = () => {
     }
   };
 
-  const findNext = (find: string) => {
+  const findNext = () => {
     const textarea = editorRef.current;
-    if (!textarea || !find) return;
-    const currentPosition = textarea.selectionEnd;
-    let index = scriptContent.indexOf(find, currentPosition);
-    if (index === -1) { index = scriptContent.indexOf(find); }
+    if (!textarea || !findValue) return;
+    const textToSearch = caseSensitive ? scriptContent : scriptContent.toLowerCase();
+    const termToFind = caseSensitive ? findValue : findValue.toLowerCase();
+    let index = textToSearch.indexOf(termToFind, textarea.selectionEnd);
+    if (index === -1) { index = textToSearch.indexOf(termToFind); }
     if (index !== -1) {
       textarea.focus();
-      textarea.setSelectionRange(index, index + find.length);
+      textarea.setSelectionRange(index, index + findValue.length);
     } else {
-      showError(`"${find}" not found.`);
+      showError(`"${findValue}" not found.`);
     }
   };
   
-  const replace = (find: string, replace: string) => {
+  const replace = () => {
     const textarea = editorRef.current;
-    if (!textarea || !find) return;
+    if (!textarea || !findValue) return;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    if (scriptContent.substring(start, end).toLowerCase() === find.toLowerCase()) {
-      const newContent = scriptContent.substring(0, start) + replace + scriptContent.substring(end);
+    const selection = scriptContent.substring(start, end);
+    const selectionToCompare = caseSensitive ? selection : selection.toLowerCase();
+    const findToCompare = caseSensitive ? findValue : findValue.toLowerCase();
+    if (selectionToCompare === findToCompare) {
+      const newContent = scriptContent.substring(0, start) + replaceValue + scriptContent.substring(end);
       setScriptContent(newContent);
       setTimeout(() => {
         const nextTextarea = editorRef.current;
         if (nextTextarea) {
-          nextTextarea.selectionStart = start + replace.length;
-          nextTextarea.selectionEnd = start + replace.length;
-          findNext(find);
+          const newCursorPos = start + replaceValue.length;
+          nextTextarea.focus();
+          nextTextarea.setSelectionRange(newCursorPos, newCursorPos);
+          findNext();
         }
       }, 0);
     } else {
-      findNext(find);
+      findNext();
     }
   };
   
-  const replaceAll = (find: string, replace: string) => {
-    if (!find) return;
-    setScriptContent(scriptContent.replaceAll(find, replace));
-    showSuccess(`Replaced all instances of "${find}"`);
+  const replaceAll = () => {
+    if (!findValue) return;
+    const flags = caseSensitive ? 'g' : 'gi';
+    const escapedFindValue = findValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedFindValue, flags);
+    setScriptContent(scriptContent.replace(regex, replaceValue));
+    showSuccess(`Replaced all instances of "${findValue}"`);
     setIsFindOpen(false);
   };
 
@@ -252,6 +279,13 @@ const EditorPage = () => {
         <FindAndReplaceDialog
           isOpen={isFindOpen}
           onClose={() => setIsFindOpen(false)}
+          findValue={findValue}
+          setFindValue={setFindValue}
+          replaceValue={replaceValue}
+          setReplaceValue={setReplaceValue}
+          caseSensitive={caseSensitive}
+          setCaseSensitive={setCaseSensitive}
+          matchCount={matchCount}
           onFindNext={findNext}
           onReplace={replace}
           onReplaceAll={replaceAll}
