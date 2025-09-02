@@ -259,6 +259,8 @@ const EditorPage = () => {
           onFindClick={() => setIsFindOpen(true)}
           onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
           onPrint={() => setDataToPrint({ script: scriptContent, titlePage: titlePageContent })}
+          scriptContent={scriptContent}
+          scriptTitle={titlePageContent.title}
         />
         <div className="flex-1 flex overflow-hidden">
           {isMobile ? (
@@ -302,7 +304,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToTtlePage} />}
       </div>
     </>
   );

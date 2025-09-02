@@ -3,14 +3,17 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { showSuccess, showError } from '@/utils/toast';
+import { exportToMarkdown } from '@/utils/export';
 
 interface HeaderProps {
   onFindClick: () => void;
   onMenuClick?: () => void;
   onPrint: () => void;
+  scriptContent: string;
+  scriptTitle: string;
 }
 
-export const Header = ({ onFindClick, onMenuClick, onPrint }: HeaderProps) => {
+export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scriptTitle }: HeaderProps) => {
   const handleExport = (format: string) => {
     if (format === 'Print') {
       onPrint();
@@ -19,6 +22,11 @@ export const Header = ({ onFindClick, onMenuClick, onPrint }: HeaderProps) => {
     if (format === 'PDF') {
       showSuccess('Exporting to PDF... Use your browser\'s print dialog to "Save as PDF".');
       onPrint();
+      return;
+    }
+    if (format === 'Markdown') {
+      exportToMarkdown(scriptContent, scriptTitle);
+      showSuccess('Exporting to Markdown...');
       return;
     }
     showError(`${format} export is a Pro feature. Please upgrade.`);
