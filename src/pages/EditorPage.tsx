@@ -8,6 +8,7 @@ import { showSuccess } from '@/utils/toast';
 import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { parseScenes, parseCharacters, parseLocations } from '@/utils/screenplay';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -148,20 +149,25 @@ const EditorPage = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-background text-foreground">
       <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          onViewChange={setActiveView}
-          scenes={scenes}
-          characters={characters}
-          locations={locations}
-          onSceneClick={handleSceneClick}
-          onCharacterClick={handleSearchAndNavigate}
-          onLocationClick={handleSearchAndNavigate}
-        />
-        <main className="flex-1 flex flex-col overflow-hidden">
-          {renderActiveView()}
-        </main>
-      </div>
+      <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
+        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+          <Sidebar
+            onViewChange={setActiveView}
+            scenes={scenes}
+            characters={characters}
+            locations={locations}
+            onSceneClick={handleSceneClick}
+            onCharacterClick={handleSearchAndNavigate}
+            onLocationClick={handleSearchAndNavigate}
+          />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={75}>
+          <main className="flex-1 flex flex-col overflow-hidden h-full">
+            {renderActiveView()}
+          </main>
+        </ResizablePanel>
+      </ResizablePanelGroup>
       <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />
       <UpgradeModal />
     </div>

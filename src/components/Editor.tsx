@@ -3,6 +3,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 interface EditorProps {
   scriptContent: string;
@@ -105,29 +106,34 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
       <div className="mb-2 text-sm text-muted-foreground">
         Current Format: <span className="capitalize font-semibold text-foreground">{format}</span>
       </div>
-      <div className="flex-1 flex gap-4 overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {isIndianFormat ? (
-          <>
-            <Textarea
-              ref={ref}
-              placeholder="Video cues, actions..."
-              className="flex-1 resize-none text-base font-mono leading-relaxed p-4 rounded-md"
-              value={scriptContent}
-              onChange={(e) => setScriptContent(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <Textarea
-              placeholder="Dialogue, sound..."
-              className="flex-1 resize-none text-base font-mono leading-relaxed p-4 rounded-md"
-              value={rightPaneContent}
-              onChange={(e) => setRightPaneContent(e.target.value)}
-            />
-          </>
+          <ResizablePanelGroup direction="horizontal" className="flex-1 rounded-lg border">
+            <ResizablePanel>
+              <Textarea
+                ref={ref}
+                placeholder="Video cues, actions..."
+                className="h-full w-full resize-none text-base font-mono leading-relaxed p-4 rounded-md border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={scriptContent}
+                onChange={(e) => setScriptContent(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel>
+              <Textarea
+                placeholder="Dialogue, sound..."
+                className="h-full w-full resize-none text-base font-mono leading-relaxed p-4 rounded-md border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={rightPaneContent}
+                onChange={(e) => setRightPaneContent(e.target.value)}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         ) : (
           <Textarea
             ref={ref}
             placeholder="Start writing your screenplay..."
-            className="w-full resize-none text-base font-mono leading-relaxed p-4 rounded-md"
+            className="w-full h-full resize-none text-base font-mono leading-relaxed p-4 rounded-md border"
             value={scriptContent}
             onChange={(e) => setScriptContent(e.target.value)}
             onKeyDown={handleKeyDown}
