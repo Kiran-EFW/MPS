@@ -13,6 +13,8 @@ interface EditorProps {
   setIsIndianFormat: (isIndian: boolean) => void;
 }
 
+const formats = ['scene', 'action', 'character', 'dialogue', 'parenthetical', 'transition'];
+
 export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   scriptContent,
   setScriptContent,
@@ -24,6 +26,14 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   const [format, setFormat] = useState('action');
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      const currentIndex = formats.indexOf(format);
+      const nextIndex = (currentIndex + 1) % formats.length;
+      setFormat(formats[nextIndex]);
+      return;
+    }
+
     if (event.key === 'Enter' && !event.shiftKey) {
       const textarea = event.currentTarget;
       setTimeout(() => {
@@ -32,29 +42,37 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
         const lines = textUpToCursor.split('\n');
         const currentLine = (lines[lines.length - 2] || '').trim();
 
+        if (currentLine.length === 0) {
+          setFormat('action');
+          return;
+        }
+
         if (currentLine.startsWith('INT.') || currentLine.startsWith('EXT.')) {
           setFormat('action');
           return;
         }
 
-        if (currentLine.endsWith('TO:')) {
+        if (format === 'transition' || (currentLine.endsWith(':') && currentLine === currentLine.toUpperCase())) {
           setFormat('scene');
           return;
         }
 
-        if (
-          currentLine === currentLine.toUpperCase() &&
-          currentLine.length > 0 &&
-          !currentLine.startsWith('INT.') &&
-          !currentLine.startsWith('EXT.') &&
-          !currentLine.endsWith('TO:') &&
-          !currentLine.startsWith('(')
-        ) {
+        if (format === 'character') {
           setFormat('dialogue');
           return;
         }
 
-        if (currentLine.length === 0 || format === 'dialogue' || format === 'parenthetical') {
+        if (format === 'dialogue' || format === 'parenthetical') {
+          setFormat('character');
+          return;
+        }
+
+        if (format === 'action' && currentLine.length > 0 && currentLine === currentLine.toUpperCase() && !currentLine.startsWith('(') && !currentLine.endsWith(')')) {
+          setFormat('dialogue');
+          return;
+        }
+
+        if (format === 'action') {
           setFormat('action');
         }
       }, 0);
