@@ -1,12 +1,15 @@
 import { Save, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 interface FooterProps {
   wordCount: number;
+  lastSaved: Date;
+  onSave: () => void;
 }
 
-export const Footer = ({ wordCount }: FooterProps) => {
+export const Footer = ({ wordCount, lastSaved, onSave }: FooterProps) => {
   return (
     <footer className="flex items-center justify-between p-2 border-t bg-card text-card-foreground text-sm">
       <div className="flex items-center gap-4">
@@ -17,9 +20,9 @@ export const Footer = ({ wordCount }: FooterProps) => {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Clock className="h-4 w-4" />
-          <span>Auto-saved: 10:32 AM</span>
+          <span>Auto-saved: {format(lastSaved, 'p')}</span>
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={onSave}>
           <Save className="mr-2 h-4 w-4" /> Save Now
         </Button>
       </div>
