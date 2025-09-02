@@ -9,7 +9,7 @@ import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { TitlePageEditor, TitlePageContent } from '@/components/TitlePageEditor';
 import { NotesEditor } from '@/components/NotesEditor';
-import { parseScenes, parseCharacters, parseLocations } from '@/utils/screenplay';
+import { parseScenes, parseCharacters, parseLocations, estimatePageCount } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -77,6 +77,7 @@ const EditorPage = () => {
   const scenes = useMemo(() => parseScenes(scriptContent), [scriptContent]);
   const characters = useMemo(() => parseCharacters(scriptContent), [scriptContent]);
   const locations = useMemo(() => parseLocations(scriptContent), [scriptContent]);
+  const pageCount = useMemo(() => estimatePageCount(scriptContent), [scriptContent]);
 
   useEffect(() => {
     if (dataToPrint !== null) {
@@ -247,7 +248,7 @@ const EditorPage = () => {
             </ResizablePanelGroup>
           )}
         </div>
-        <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />
+        <Footer wordCount={wordCount} pageCount={pageCount} onSave={handleSave} lastSaved={lastSaved} />
         <FindAndReplaceDialog
           isOpen={isFindOpen}
           onClose={() => setIsFindOpen(false)}
@@ -258,7 +259,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToTtlePage} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
       </div>
     </>
   );

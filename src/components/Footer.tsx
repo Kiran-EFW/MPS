@@ -5,15 +5,16 @@ import { format } from 'date-fns';
 
 interface FooterProps {
   wordCount: number;
+  pageCount: number;
   lastSaved: Date;
   onSave: () => void;
 }
 
-export const Footer = ({ wordCount, lastSaved, onSave }: FooterProps) => {
+export const Footer = ({ wordCount, pageCount, lastSaved, onSave }: FooterProps) => {
   return (
     <footer className="flex items-center justify-between p-2 border-t bg-card text-card-foreground text-sm flex-wrap gap-2">
       <div className="flex items-center gap-4 flex-wrap">
-        <span>Page: 1/10</span>
+        <span>Page: {pageCount}/10</span>
         <span>Words: {wordCount}</span>
         <Badge variant="destructive">10-page limit for free users</Badge>
       </div>

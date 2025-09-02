@@ -53,3 +53,12 @@ export const parseLocations = (script: string): string[] => {
   });
   return [...new Set(locations)];
 };
+
+const LINES_PER_PAGE = 55; // Industry standard approximation
+
+export const estimatePageCount = (script: string): number => {
+  if (!script) return 1;
+  const lines = script.split('\n').length;
+  const count = Math.ceil(lines / LINES_PER_PAGE);
+  return Math.max(1, count); // Ensure it's at least 1
+};
