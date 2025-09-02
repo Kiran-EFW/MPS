@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
+import { showSuccess } from '@/utils/toast';
 
 const PROMPT_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const LOCKOUT_DURATION = 30 * 1000; // 30 seconds
@@ -42,6 +43,11 @@ export const UpgradeModal = () => {
     }
   };
 
+  const handleUpgrade = () => {
+    showSuccess('Redirecting to checkout...');
+    // The AlertDialogAction will close the modal automatically.
+  };
+
   return (
     <AlertDialog open={isOpen}>
       <AlertDialogContent>
@@ -58,7 +64,7 @@ export const UpgradeModal = () => {
             {lockoutTime > 0 ? `Continue in ${lockoutTime}s` : 'Continue as Free User'}
           </Button>
           <AlertDialogAction asChild>
-            <Button>Upgrade to Pro</Button>
+            <Button onClick={handleUpgrade}>Upgrade to Pro</Button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
