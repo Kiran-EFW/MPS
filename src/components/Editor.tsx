@@ -40,6 +40,12 @@ export const Editor = ({
           return;
         }
 
+        // Rule: After a Transition, switch to Scene Heading
+        if (currentLine.endsWith('TO:')) {
+          setFormat('scene');
+          return;
+        }
+
         // Rule: After a Character, switch to Dialogue
         // Heuristic: The line is all uppercase, not a scene heading, and not a transition.
         if (
@@ -47,20 +53,16 @@ export const Editor = ({
           currentLine.length > 0 &&
           !currentLine.startsWith('INT.') &&
           !currentLine.startsWith('EXT.') &&
-          !currentLine.endsWith('TO:')
+          !currentLine.endsWith('TO:') &&
+          !currentLine.startsWith('(') // Avoid matching parentheticals like (V.O)
         ) {
           setFormat('dialogue');
           return;
         }
 
-        // Rule: After a Transition, switch to Scene Heading
-        if (currentLine.endsWith('TO:')) {
-          setFormat('scene');
-          return;
-        }
-
-        // Default to Action if the line was empty (double enter)
-        if (currentLine.length === 0) {
+        // Rule: If the line was empty (double enter), or we just finished dialogue, default to Action.
+        // This makes it easy to move from dialogue back to describing the scene.
+        if (currentLine.length === 0 || format === 'dialogue' || format === 'parenthetical') {
           setFormat('action');
         }
       }, 0);
