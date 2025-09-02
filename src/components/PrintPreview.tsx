@@ -12,7 +12,7 @@ export const PrintPreview = ({ script, titlePage }: PrintPreviewProps) => {
 
   return (
     <div id="print-area">
-      <div className="print-title-page">
+      <div className="print-page print-title-page">
         <div className="print-title-content">
           <h1 className="print-title">{titlePage.title || 'Untitled Screenplay'}</h1>
           <p className="print-author">by</p>
@@ -24,13 +24,15 @@ export const PrintPreview = ({ script, titlePage }: PrintPreviewProps) => {
           ))}
         </div>
       </div>
-      {parsedScript.map((line, index) => {
-        const className = `print-${line.type}`;
-        if (line.type === 'empty') {
-          return <br key={index} />;
-        }
-        return <div key={index} className={className}>{line.text}</div>;
-      })}
+      <div className="print-script-body">
+        {parsedScript.map((line, index) => {
+          const className = `print-${line.type}`;
+          if (line.type === 'empty') {
+            return <br key={index} />;
+          }
+          return <div key={index} className={className}>{line.text}</div>;
+        })}
+      </div>
     </div>
   );
 };

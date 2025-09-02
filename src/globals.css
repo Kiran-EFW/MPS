@@ -97,61 +97,79 @@
 
   body {
     @apply bg-background text-foreground;
+    counter-reset: page;
+  }
+
+  @page {
+    size: 8.5in 11in;
+    margin: 1in 1in 1in 1.5in; /* Top, Right, Bottom, Left */
+
+    @top-right {
+      content: counter(page);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12pt;
+    }
+  }
+
+  @page:first {
+    @top-right {
+      content: none;
+    }
   }
 
   @media print {
     body {
       margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12pt;
+      line-height: 1;
     }
     #app-container {
       display: none;
     }
     #print-container {
       display: block;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 12pt;
-      line-height: 1.5;
+    }
+    .print-page {
+      page-break-after: always;
+      height: 9in; /* 11in page height - 1in top margin - 1in bottom margin */
+      position: relative;
+      box-sizing: border-box;
     }
     .print-title-page {
-      height: 11in;
-      padding: 1in 1in 1in 1.5in;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      page-break-after: always;
     }
     .print-title-content {
       text-align: center;
-      padding-top: 3in;
+      padding-top: 3.5in;
     }
     .print-title {
       font-weight: bold;
       text-transform: uppercase;
-      margin-bottom: 1em;
+      margin-bottom: 2em;
     }
     .print-author {
       margin-bottom: 1em;
     }
     .print-contact {
-      padding-bottom: 0.5in;
+      text-align: left;
     }
     .print-contact p {
       margin: 0;
     }
-    #print-area > div:not(.print-title-page) {
-      padding: 1in 1in 1in 1.5in;
-    }
     .print-scene {
       font-weight: bold;
       text-transform: uppercase;
-      margin-top: 1.5em;
+      margin-top: 2em;
       margin-bottom: 1em;
     }
     .print-action {
       margin-bottom: 1em;
     }
     .print-character {
-      padding-left: 2in;
+      padding-left: 2.2in;
       text-transform: uppercase;
       margin-top: 1em;
     }
@@ -160,10 +178,10 @@
       padding-right: 1in;
     }
     .print-parenthetical {
-      padding-left: 1.5in;
+      padding-left: 1.6in;
     }
     .print-transition {
-      padding-left: 4in;
+      padding-left: 4.5in;
       text-transform: uppercase;
       margin-top: 1em;
       margin-bottom: 1em;
