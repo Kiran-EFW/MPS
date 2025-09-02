@@ -1,3 +1,37 @@
+export interface Scene {
+  heading: string;
+  content: string;
+}
+
+export const parseScriptToScenes = (script: string): Scene[] => {
+  if (!script) return [];
+  const lines = script.split('\n');
+  const scenes: Scene[] = [];
+  let currentScene: Scene | null = null;
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith('INT.') || trimmedLine.startsWith('EXT.')) {
+      if (currentScene) {
+        scenes.push(currentScene);
+      }
+      currentScene = { heading: trimmedLine, content: '' };
+    } else if (currentScene) {
+      currentScene.content += line + '\n';
+    }
+  }
+
+  if (currentScene) {
+    scenes.push(currentScene);
+  }
+  
+  scenes.forEach(scene => {
+    scene.content = scene.content.trim();
+  });
+
+  return scenes;
+};
+
 export const parseScenes = (script: string): string[] => {
   if (!script) return [];
   const lines = script.split('\n');

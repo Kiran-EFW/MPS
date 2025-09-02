@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { FileText, Video, Users, MapPin, Notebook } from 'lucide-react';
+import { FileText, Video, Users, MapPin, Notebook, LayoutList } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 
 interface SidebarProps {
@@ -34,6 +34,7 @@ export const Sidebar = ({
         { name: 'Untitled Screenplay', view: 'screenplay' },
         { name: 'Logline', view: 'logline' },
         { name: 'Synopsis', view: 'synopsis' },
+        { name: 'Outline', view: 'outline' },
       ],
     },
     {
@@ -86,42 +87,57 @@ export const Sidebar = ({
         return `Click to load ${name}`;
     }
   };
+  
+  const getIcon = (label: string) => {
+    switch (label) {
+      case 'Project Navigator': return FileText;
+      case 'Scenes': return Video;
+      case 'Characters': return Users;
+      case 'Locations': return MapPin;
+      case 'Notes': return Notebook;
+      default: return FileText;
+    }
+  }
 
   return (
     <aside className="w-full h-full p-4 border-r bg-card text-card-foreground overflow-y-auto">
       <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes', 'Characters', 'Locations', 'Notes']} className="w-full">
-        {sidebarItems.map((item) => (
-          <AccordionItem value={item.label} key={item.label}>
-            <AccordionTrigger>
-              <div className="flex items-center gap-2">
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-1 pl-4">
-                {item.content.map((contentItem) => (
-                  <li key={contentItem.name}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-left h-auto py-1 px-2 truncate"
-                          onClick={() => handleItemClick(contentItem, item.label)}
-                        >
-                          {contentItem.name}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <p>{getTooltipText(item.label, contentItem.name)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+        {sidebarItems.map((item) => {
+          const Icon = getIcon(item.label);
+          return (
+            <AccordionItem value={item.label} key={item.label}>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-1 pl-4">
+                  {item.content.map((contentItem) => (
+                    <li key={contentItem.name}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-left h-auto py-1 px-2 truncate"
+                            onClick={() => handleItemClick(contentItem, item.label)}
+                          >
+                            {contentItem.name === 'Outline' && <LayoutList className="mr-2 h-4 w-4" />}
+                            {contentItem.name}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p>{getTooltipText(item.label, contentItem.name)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          )
+        })}
       </Accordion>
     </aside>
   );

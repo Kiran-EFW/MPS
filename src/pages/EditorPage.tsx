@@ -9,6 +9,7 @@ import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { TitlePageEditor, TitlePageContent } from '@/components/TitlePageEditor';
 import { NotesEditor } from '@/components/NotesEditor';
+import { OutlineEditor } from '@/components/OutlineEditor';
 import { parseScenes, parseCharacters, parseLocations, estimatePageCount } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
@@ -118,31 +119,37 @@ const EditorPage = () => {
   };
 
   const handleSearchAndNavigate = (searchTerm: string) => {
-    const textarea = editorRef.current;
-    if (textarea) {
-      const currentPosition = textarea.selectionStart;
-      let index = textarea.value.indexOf(searchTerm, currentPosition + 1);
-      if (index === -1) { index = textarea.value.indexOf(searchTerm); }
-      if (index !== -1) {
-        textarea.focus();
-        textarea.setSelectionRange(index, index + searchTerm.length);
-        showSuccess(`Found "${searchTerm}"`);
-      } else {
-        showSuccess(`"${searchTerm}" not found`);
+    setActiveView('screenplay');
+    setTimeout(() => {
+      const textarea = editorRef.current;
+      if (textarea) {
+        const currentPosition = textarea.selectionStart;
+        let index = textarea.value.indexOf(searchTerm, currentPosition + 1);
+        if (index === -1) { index = textarea.value.indexOf(searchTerm); }
+        if (index !== -1) {
+          textarea.focus();
+          textarea.setSelectionRange(index, index + searchTerm.length);
+          showSuccess(`Found "${searchTerm}"`);
+        } else {
+          showSuccess(`"${searchTerm}" not found`);
+        }
       }
-    }
+    }, 0);
   };
 
   const handleSceneClick = (scene: string) => {
-    const textarea = editorRef.current;
-    if (textarea) {
-      const index = textarea.value.indexOf(scene);
-      if (index !== -1) {
-        textarea.focus();
-        textarea.setSelectionRange(index, index);
-        showSuccess(`Navigated to scene`);
+    setActiveView('screenplay');
+    setTimeout(() => {
+      const textarea = editorRef.current;
+      if (textarea) {
+        const index = textarea.value.indexOf(scene);
+        if (index !== -1) {
+          textarea.focus();
+          textarea.setSelectionRange(index, index);
+          showSuccess(`Navigated to scene`);
+        }
       }
-    }
+    }, 0);
   };
 
   const findNext = () => {
@@ -214,6 +221,8 @@ const EditorPage = () => {
         return <SynopsisEditor content={synopsisContent} setContent={setSynopsisContent} />;
       case 'notes':
         return <NotesEditor content={notesContent} setContent={setNotesContent} />;
+      case 'outline':
+        return <OutlineEditor scriptContent={scriptContent} onSceneClick={handleSceneClick} />;
       case 'screenplay':
       default:
         return (
