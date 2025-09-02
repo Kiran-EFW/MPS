@@ -7,15 +7,21 @@ import { showSuccess, showError } from '@/utils/toast';
 interface HeaderProps {
   onFindClick: () => void;
   onMenuClick?: () => void;
+  onPrint: () => void;
 }
 
-export const Header = ({ onFindClick, onMenuClick }: HeaderProps) => {
+export const Header = ({ onFindClick, onMenuClick, onPrint }: HeaderProps) => {
   const handleExport = (format: string) => {
-    if (['PDF', 'Print'].includes(format)) {
-      showSuccess(`Exporting to ${format}...`);
-    } else {
-      showError(`${format} export is a Pro feature. Please upgrade.`);
+    if (format === 'Print') {
+      onPrint();
+      return;
     }
+    if (format === 'PDF') {
+      showSuccess('Exporting to PDF... Use your browser\'s print dialog to "Save as PDF".');
+      onPrint();
+      return;
+    }
+    showError(`${format} export is a Pro feature. Please upgrade.`);
   };
 
   const handleLanguage = (lang: string) => {

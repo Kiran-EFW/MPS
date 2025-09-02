@@ -98,4 +98,47 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  @media print {
+    body {
+      margin: 0;
+    }
+    #app-container {
+      display: none;
+    }
+    #print-container {
+      display: block;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12pt;
+      line-height: 1.5;
+      padding: 1in 1in 1in 1.5in;
+    }
+    .print-scene {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 1.5em;
+      margin-bottom: 1em;
+    }
+    .print-action {
+      margin-bottom: 1em;
+    }
+    .print-character {
+      padding-left: 2in;
+      text-transform: uppercase;
+      margin-top: 1em;
+    }
+    .print-dialogue {
+      padding-left: 1in;
+      padding-right: 1in;
+    }
+    .print-parenthetical {
+      padding-left: 1.5in;
+    }
+    .print-transition {
+      padding-left: 4in;
+      text-transform: uppercase;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+  }
 }

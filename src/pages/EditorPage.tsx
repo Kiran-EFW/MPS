@@ -12,6 +12,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { PrintPreview } from '@/components/PrintPreview';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -48,6 +49,7 @@ const EditorPage = () => {
   const [isFindOpen, setIsFindOpen] = useState(false);
   const isMobile = useIsMobile();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [scriptToPrint, setScriptToPrint] = useState<string | null>(null);
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
@@ -61,6 +63,13 @@ const EditorPage = () => {
   const scenes = useMemo(() => parseScenes(scriptContent), [scriptContent]);
   const characters = useMemo(() => parseCharacters(scriptContent), [scriptContent]);
   const locations = useMemo(() => parseLocations(scriptContent), [scriptContent]);
+
+  useEffect(() => {
+    if (scriptToPrint !== null) {
+      window.print();
+      setScriptToPrint(null);
+    }
+  }, [scriptToPrint]);
 
   useEffect(() => {
     localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent);
@@ -216,45 +225,51 @@ const EditorPage = () => {
   );
 
   return (
-    <div className="flex flex-col h-screen w-full bg-background text-foreground">
-      <Header
-        onFindClick={() => setIsFindOpen(true)}
-        onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
-      />
-      <div className="flex-1 flex overflow-hidden">
-        {isMobile ? (
-          <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
-            {renderActiveView()}
-            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-              <SheetContent side="left" className="p-0 w-[80%] max-w-sm">
+    <>
+      <div id="app-container" className="flex flex-col h-screen w-full bg-background text-foreground">
+        <Header
+          onFindClick={() => setIsFindOpen(true)}
+          onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
+          onPrint={() => setScriptToPrint(scriptContent)}
+        />
+        <div className="flex-1 flex overflow-hidden">
+          {isMobile ? (
+            <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
+              {renderActiveView()}
+              <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+                <SheetContent side="left" className="p-0 w-[80%] max-w-sm">
+                  {sidebarComponent}
+                </SheetContent>
+              </Sheet>
+            </main>
+          ) : (
+            <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
+              <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
                 {sidebarComponent}
-              </SheetContent>
-            </Sheet>
-          </main>
-        ) : (
-          <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
-            <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-              {sidebarComponent}
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={75}>
-              <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
-                {renderActiveView()}
-              </main>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        )}
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={75}>
+                <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
+                  {renderActiveView()}
+                </main>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          )}
+        </div>
+        <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />
+        <FindAndReplaceDialog
+          isOpen={isFindOpen}
+          onClose={() => setIsFindOpen(false)}
+          onFindNext={findNext}
+          onReplace={replace}
+          onReplaceAll={replaceAll}
+        />
+        <UpgradeModal />
       </div>
-      <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />
-      <FindAndReplaceDialog
-        isOpen={isFindOpen}
-        onClose={() => setIsFindOpen(false)}
-        onFindNext={findNext}
-        onReplace={replace}
-        onReplaceAll={replaceAll}
-      />
-      <UpgradeModal />
-    </div>
+      <div id="print-container">
+        {scriptToPrint && <PrintPreview script={scriptToPrint} />}
+      </div>
+    </>
   );
 };
 
