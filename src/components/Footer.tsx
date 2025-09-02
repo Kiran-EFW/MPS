@@ -11,13 +11,13 @@ interface FooterProps {
 
 export const Footer = ({ wordCount, lastSaved, onSave }: FooterProps) => {
   return (
-    <footer className="flex items-center justify-between p-2 border-t bg-card text-card-foreground text-sm">
-      <div className="flex items-center gap-4">
+    <footer className="flex items-center justify-between p-2 border-t bg-card text-card-foreground text-sm flex-wrap gap-2">
+      <div className="flex items-center gap-4 flex-wrap">
         <span>Page: 1/10</span>
         <span>Words: {wordCount}</span>
         <Badge variant="destructive">10-page limit for free users</Badge>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap justify-end">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Clock className="h-4 w-4" />
           <span>Auto-saved: {format(lastSaved, 'p')}</span>

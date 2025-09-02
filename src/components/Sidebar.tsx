@@ -12,6 +12,7 @@ interface SidebarProps {
   onSceneClick: (scene: string) => void;
   onCharacterClick: (character: string) => void;
   onLocationClick: (location: string) => void;
+  onItemClick?: () => void;
 }
 
 export const Sidebar = ({
@@ -22,6 +23,7 @@ export const Sidebar = ({
   onSceneClick,
   onCharacterClick,
   onLocationClick,
+  onItemClick,
 }: SidebarProps) => {
   const sidebarItems = [
     {
@@ -73,6 +75,7 @@ export const Sidebar = ({
     } else {
       showSuccess(`Loading ${item.name}...`);
     }
+    onItemClick?.();
   };
 
   const getTooltipText = (label: string, name: string) => {
@@ -89,7 +92,7 @@ export const Sidebar = ({
   };
 
   return (
-    <aside className="w-72 p-4 border-r bg-card text-card-foreground overflow-y-auto">
+    <aside className="w-full h-full p-4 border-r bg-card text-card-foreground overflow-y-auto">
       <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes', 'Characters', 'Locations']} className="w-full">
         {sidebarItems.map((item) => (
           <AccordionItem value={item.label} key={item.label}>

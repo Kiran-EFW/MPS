@@ -1,4 +1,4 @@
-import { FileDown, Languages, Globe, Search } from 'lucide-react';
+import { FileDown, Languages, Globe, Search, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -6,9 +6,10 @@ import { showSuccess, showError } from '@/utils/toast';
 
 interface HeaderProps {
   onFindClick: () => void;
+  onMenuClick?: () => void;
 }
 
-export const Header = ({ onFindClick }: HeaderProps) => {
+export const Header = ({ onFindClick, onMenuClick }: HeaderProps) => {
   const handleExport = (format: string) => {
     if (['PDF', 'Print'].includes(format)) {
       showSuccess(`Exporting to ${format}...`);
@@ -27,7 +28,14 @@ export const Header = ({ onFindClick }: HeaderProps) => {
 
   return (
     <header className="flex items-center justify-between p-2 border-b bg-card text-card-foreground z-10">
-      <h1 className="text-xl font-bold">MindPaperScreen</h1>
+      <div className="flex items-center gap-2">
+        {onMenuClick && (
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={onMenuClick}>
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
+        <h1 className="text-xl font-bold">MindPaperScreen</h1>
+      </div>
       <div className="flex items-center gap-2">
         <Button variant="outline" onClick={onFindClick}>
           <Search className="mr-2 h-4 w-4" /> Find & Replace

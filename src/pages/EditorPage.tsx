@@ -10,6 +10,8 @@ import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { parseScenes, parseCharacters, parseLocations } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -44,6 +46,8 @@ const SYNOPSIS_STORAGE_KEY = 'mindpaperscreen-synopsis';
 const EditorPage = () => {
   const [activeView, setActiveView] = useState('screenplay');
   const [isFindOpen, setIsFindOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
@@ -198,28 +202,49 @@ const EditorPage = () => {
     }
   };
 
+  const sidebarComponent = (
+    <Sidebar
+      onViewChange={setActiveView}
+      scenes={scenes}
+      characters={characters}
+      locations={locations}
+      onSceneClick={handleSceneClick}
+      onCharacterClick={handleSearchAndNavigate}
+      onLocationClick={handleSearchAndNavigate}
+      onItemClick={() => isMobile && setIsMobileSidebarOpen(false)}
+    />
+  );
+
   return (
     <div className="flex flex-col h-screen w-full bg-background text-foreground">
-      <Header onFindClick={() => setIsFindOpen(true)} />
-      <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-          <Sidebar
-            onViewChange={setActiveView}
-            scenes={scenes}
-            characters={characters}
-            locations={locations}
-            onSceneClick={handleSceneClick}
-            onCharacterClick={handleSearchAndNavigate}
-            onLocationClick={handleSearchAndNavigate}
-          />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={75}>
+      <Header
+        onFindClick={() => setIsFindOpen(true)}
+        onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
+      />
+      <div className="flex-1 flex overflow-hidden">
+        {isMobile ? (
           <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
             {renderActiveView()}
+            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+              <SheetContent side="left" className="p-0 w-[80%] max-w-sm">
+                {sidebarComponent}
+              </SheetContent>
+            </Sheet>
           </main>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        ) : (
+          <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
+            <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+              {sidebarComponent}
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={75}>
+              <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
+                {renderActiveView()}
+              </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
+      </div>
       <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />
       <FindAndReplaceDialog
         isOpen={isFindOpen}
