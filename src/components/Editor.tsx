@@ -23,6 +23,50 @@ export const Editor = ({
 }: EditorProps) => {
   const [format, setFormat] = useState('action');
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      const textarea = event.currentTarget;
+      // We need a slight delay to allow the newline character to be inserted before we check the line content.
+      setTimeout(() => {
+        const cursorPosition = textarea.selectionStart;
+        const textUpToCursor = textarea.value.substring(0, cursorPosition);
+        const lines = textUpToCursor.split('\n');
+        // The line before the new empty line is the one we want to check.
+        const currentLine = (lines[lines.length - 2] || '').trim();
+
+        // Rule: After a Scene Heading, switch to Action
+        if (currentLine.startsWith('INT.') || currentLine.startsWith('EXT.')) {
+          setFormat('action');
+          return;
+        }
+
+        // Rule: After a Character, switch to Dialogue
+        // Heuristic: The line is all uppercase, not a scene heading, and not a transition.
+        if (
+          currentLine === currentLine.toUpperCase() &&
+          currentLine.length > 0 &&
+          !currentLine.startsWith('INT.') &&
+          !currentLine.startsWith('EXT.') &&
+          !currentLine.endsWith('TO:')
+        ) {
+          setFormat('dialogue');
+          return;
+        }
+
+        // Rule: After a Transition, switch to Scene Heading
+        if (currentLine.endsWith('TO:')) {
+          setFormat('scene');
+          return;
+        }
+
+        // Default to Action if the line was empty (double enter)
+        if (currentLine.length === 0) {
+          setFormat('action');
+        }
+      }, 0);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col p-4 bg-background overflow-hidden">
       <div className="flex items-center justify-between mb-4 pb-4 border-b flex-wrap gap-4">
@@ -57,6 +101,7 @@ export const Editor = ({
               className="flex-1 resize-none text-base font-mono leading-relaxed p-4 rounded-md"
               value={scriptContent}
               onChange={(e) => setScriptContent(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
             <Textarea
               placeholder="Dialogue, sound..."
@@ -71,6 +116,7 @@ export const Editor = ({
             className="w-full resize-none text-base font-mono leading-relaxed p-4 rounded-md"
             value={scriptContent}
             onChange={(e) => setScriptContent(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
         )}
       </div>
