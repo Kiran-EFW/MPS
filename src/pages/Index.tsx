@@ -5,6 +5,8 @@ import { Editor } from '@/components/Editor';
 import { Footer } from '@/components/Footer';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { showSuccess } from '@/utils/toast';
+import { LoglineEditor } from '@/components/LoglineEditor';
+import { SynopsisEditor } from '@/components/SynopsisEditor';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -24,57 +26,68 @@ JANE
 Writer's block? Or just procrastinating on Reddit?
 `;
 
-const AUTO_SAVE_INTERVAL = 60 * 1000; // 1 minute
 const SCRIPT_STORAGE_KEY = 'mindpaperscreen-script';
 const RIGHT_PANE_STORAGE_KEY = 'mindpaperscreen-right-pane';
+const LOGLINE_STORAGE_KEY = 'mindpaperscreen-logline';
+const SYNOPSIS_STORAGE_KEY = 'mindpaperscreen-synopsis';
 
 const Index = () => {
-  const [scriptContent, setScriptContent] = useState(() => {
-    return localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript;
-  });
-  const [rightPaneContent, setRightPaneContent] = useState(() => {
-    return localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '';
-  });
+  const [activeView, setActiveView] = useState('screenplay');
+
+  const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
+  const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
+  const [loglineContent, setLoglineContent] = useState(() => localStorage.getItem(LOGLINE_STORAGE_KEY) || '');
+  const [synopsisContent, setSynopsisContent] = useState(() => localStorage.getItem(SYNOPSIS_STORAGE_KEY) || '');
+
   const [isIndianFormat, setIsIndianFormat] = useState(false);
   const [lastSaved, setLastSaved] = useState(new Date());
 
-  // Save script content to local storage on change
   useEffect(() => {
     localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent);
     setLastSaved(new Date());
   }, [scriptContent]);
 
-  // Save right pane content to local storage on change
   useEffect(() => {
     localStorage.setItem(RIGHT_PANE_STORAGE_KEY, rightPaneContent);
     setLastSaved(new Date());
   }, [rightPaneContent]);
 
-  const handleSave = () => {
-    // Manual save is now just for user feedback, as it saves on every keystroke.
+  useEffect(() => {
+    localStorage.setItem(LOGLINE_STORAGE_KEY, loglineContent);
     setLastSaved(new Date());
-    showSuccess('Script saved!');
+  }, [loglineContent]);
+
+  useEffect(() => {
+    localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent);
+    setLastSaved(new Date());
+  }, [synopsisContent]);
+
+  const handleSave = () => {
+    setLastSaved(new Date());
+    showSuccess('Project saved!');
   };
 
-  // This interval is now just for periodic "auto-saved" notifications.
   useEffect(() => {
     const interval = setInterval(() => {
-      showSuccess('Script auto-saved!');
-    }, AUTO_SAVE_INTERVAL);
+      showSuccess('Project auto-saved!');
+    }, 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const wordCount =
-    (scriptContent.trim().split(/\s+/).filter(Boolean).length || 0) +
-    (rightPaneContent.trim().split(/\s+/).filter(Boolean).length || 0);
+  const wordCount = [scriptContent, rightPaneContent, loglineContent, synopsisContent]
+    .map((content) => content.trim().split(/\s+/).filter(Boolean).length)
+    .reduce((sum, count) => sum + count, 0);
 
-  return (
-    <div className="flex flex-col h-screen w-full bg-background text-foreground">
-      <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 flex flex-col overflow-hidden">
+  const renderActiveView = () => {
+    switch (activeView) {
+      case 'logline':
+        return <LoglineEditor content={loglineContent} setContent={setLoglineContent} />;
+      case 'synopsis':
+        return <SynopsisEditor content={synopsisContent} setContent={setSynopsisContent} />;
+      case 'screenplay':
+      default:
+        return (
           <Editor
             scriptContent={scriptContent}
             setScriptContent={setScriptContent}
@@ -83,6 +96,17 @@ const Index = () => {
             isIndianFormat={isIndianFormat}
             setIsIndianFormat={setIsIndianFormat}
           />
+        );
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-screen w-full bg-background text-foreground">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar onViewChange={setActiveView} />
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {renderActiveView()}
         </main>
       </div>
       <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />

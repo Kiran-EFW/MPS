@@ -5,18 +5,54 @@ import { FileText, Video, Users, MapPin, Notebook, History } from 'lucide-react'
 import { showSuccess } from '@/utils/toast';
 
 const sidebarItems = [
-  { icon: FileText, label: 'Project Navigator', content: ['Untitled Screenplay', 'Logline', 'Synopsis'] },
-  { icon: Video, label: 'Scenes', content: ['Scene 1: INT. COFFEE SHOP - DAY', 'Scene 2: EXT. PARK - NIGHT'] },
-  { icon: Users, label: 'Characters', content: ['JOHN (30s)', 'JANE (30s)'] },
-  { icon: MapPin, label: 'Locations', content: ['COFFEE SHOP', 'PARK'] },
-  { icon: Notebook, label: 'Notes', content: ['Research on 1920s fashion', 'Dialogue ideas'] },
-  { icon: History, label: 'Workflow History', content: ['Saved 2 mins ago', 'Edited Scene 1'] },
+  {
+    icon: FileText,
+    label: 'Project Navigator',
+    content: [
+      { name: 'Untitled Screenplay', view: 'screenplay' },
+      { name: 'Logline', view: 'logline' },
+      { name: 'Synopsis', view: 'synopsis' },
+    ],
+  },
+  {
+    icon: Video,
+    label: 'Scenes',
+    content: [{ name: 'Scene 1: INT. COFFEE SHOP - DAY' }, { name: 'Scene 2: EXT. PARK - NIGHT' }],
+  },
+  {
+    icon: Users,
+    label: 'Characters',
+    content: [{ name: 'JOHN (30s)' }, { name: 'JANE (30s)' }],
+  },
+  {
+    icon: MapPin,
+    label: 'Locations',
+    content: [{ name: 'COFFEE SHOP' }, { name: 'PARK' }],
+  },
+  {
+    icon: Notebook,
+    label: 'Notes',
+    content: [{ name: 'Research on 1920s fashion' }, { name: 'Dialogue ideas' }],
+  },
+  {
+    icon: History,
+    label: 'Workflow History',
+    content: [{ name: 'Saved 2 mins ago' }, { name: 'Edited Scene 1' }],
+  },
 ];
 
-export const Sidebar = () => {
-  const handleItemClick = (itemName: string) => {
-    showSuccess(`Loading ${itemName}...`);
-    // In a real app, this is where you would load the content for the selected item.
+interface SidebarProps {
+  onViewChange: (view: string) => void;
+}
+
+export const Sidebar = ({ onViewChange }: SidebarProps) => {
+  const handleItemClick = (item: { name: string; view?: string }) => {
+    if (item.view) {
+      onViewChange(item.view);
+      showSuccess(`Switched to ${item.name}`);
+    } else {
+      showSuccess(`Loading ${item.name}...`);
+    }
   };
 
   return (
@@ -33,7 +69,7 @@ export const Sidebar = () => {
             <AccordionContent>
               <ul className="space-y-1 pl-4">
                 {item.content.map((contentItem) => (
-                  <li key={contentItem}>
+                  <li key={contentItem.name}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
@@ -41,11 +77,11 @@ export const Sidebar = () => {
                           className="w-full justify-start text-left h-auto py-1 px-2 truncate"
                           onClick={() => handleItemClick(contentItem)}
                         >
-                          {contentItem}
+                          {contentItem.name}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="right">
-                        <p>Click to load {contentItem}</p>
+                        <p>Click to load {contentItem.name}</p>
                       </TooltipContent>
                     </Tooltip>
                   </li>
