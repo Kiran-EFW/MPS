@@ -4,11 +4,12 @@ import { Sidebar } from '@/components/Sidebar';
 import { Editor } from '@/components/Editor';
 import { Footer } from '@/components/Footer';
 import { UpgradeModal } from '@/components/UpgradeModal';
-import { showSuccess } from '@/utils/toast';
+import { showSuccess, showError } from '@/utils/toast';
 import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { parseScenes, parseCharacters, parseLocations } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -42,6 +43,7 @@ const SYNOPSIS_STORAGE_KEY = 'mindpaperscreen-synopsis';
 
 const EditorPage = () => {
   const [activeView, setActiveView] = useState('screenplay');
+  const [isFindOpen, setIsFindOpen] = useState(false);
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
@@ -112,6 +114,56 @@ const EditorPage = () => {
     }
   };
 
+  const findNext = (find: string) => {
+    const textarea = editorRef.current;
+    if (!textarea || !find) return;
+    
+    const currentPosition = textarea.selectionEnd;
+    let index = scriptContent.indexOf(find, currentPosition);
+    
+    if (index === -1) {
+      index = scriptContent.indexOf(find);
+    }
+  
+    if (index !== -1) {
+      textarea.focus();
+      textarea.setSelectionRange(index, index + find.length);
+    } else {
+      showError(`"${find}" not found.`);
+    }
+  };
+  
+  const replace = (find: string, replace: string) => {
+    const textarea = editorRef.current;
+    if (!textarea || !find) return;
+  
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (scriptContent.substring(start, end).toLowerCase() === find.toLowerCase()) {
+      const newContent = scriptContent.substring(0, start) + replace + scriptContent.substring(end);
+      setScriptContent(newContent);
+      
+      setTimeout(() => {
+        const nextTextarea = editorRef.current;
+        if (nextTextarea) {
+          nextTextarea.selectionStart = start + replace.length;
+          nextTextarea.selectionEnd = start + replace.length;
+          findNext(find);
+        }
+      }, 0);
+    } else {
+      findNext(find);
+    }
+  };
+  
+  const replaceAll = (find: string, replace: string) => {
+    if (!find) return;
+    setScriptContent(scriptContent.replaceAll(find, replace));
+    showSuccess(`Replaced all instances of "${find}"`);
+    setIsFindOpen(false);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       showSuccess('Project auto-saved!');
@@ -148,7 +200,7 @@ const EditorPage = () => {
 
   return (
     <div className="flex flex-col h-screen w-full bg-background text-foreground">
-      <Header />
+      <Header onFindClick={() => setIsFindOpen(true)} />
       <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
         <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
           <Sidebar
@@ -163,12 +215,19 @@ const EditorPage = () => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={75}>
-          <main className="flex-1 flex flex-col overflow-hidden h-full">
+          <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
             {renderActiveView()}
           </main>
         </ResizablePanel>
       </ResizablePanelGroup>
       <Footer wordCount={wordCount} onSave={handleSave} lastSaved={lastSaved} />
+      <FindAndReplaceDialog
+        isOpen={isFindOpen}
+        onClose={() => setIsFindOpen(false)}
+        onFindNext={findNext}
+        onReplace={replace}
+        onReplaceAll={replaceAll}
+      />
       <UpgradeModal />
     </div>
   );

@@ -81,7 +81,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 bg-background overflow-hidden">
+    <div className="flex-1 flex flex-col bg-background overflow-hidden">
       <div className="flex items-center justify-between mb-4 pb-4 border-b flex-wrap gap-4">
         <ToggleGroup
           type="single"

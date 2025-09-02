@@ -7,7 +7,7 @@ interface LoglineEditorProps {
 
 export const LoglineEditor = ({ content, setContent }: LoglineEditorProps) => {
   return (
-    <div className="flex-1 flex flex-col p-4 bg-background overflow-hidden">
+    <div className="flex-1 flex flex-col bg-background overflow-hidden">
       <h2 className="text-2xl font-bold mb-4">Logline</h2>
       <p className="text-sm text-muted-foreground mb-4">
         A one-sentence summary of your story.

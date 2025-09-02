@@ -1,10 +1,14 @@
-import { FileDown, Languages, Globe } from 'lucide-react';
+import { FileDown, Languages, Globe, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { showSuccess, showError } from '@/utils/toast';
 
-export const Header = () => {
+interface HeaderProps {
+  onFindClick: () => void;
+}
+
+export const Header = ({ onFindClick }: HeaderProps) => {
   const handleExport = (format: string) => {
     if (['PDF', 'Print'].includes(format)) {
       showSuccess(`Exporting to ${format}...`);
@@ -25,6 +29,9 @@ export const Header = () => {
     <header className="flex items-center justify-between p-2 border-b bg-card text-card-foreground z-10">
       <h1 className="text-xl font-bold">MindPaperScreen</h1>
       <div className="flex items-center gap-2">
+        <Button variant="outline" onClick={onFindClick}>
+          <Search className="mr-2 h-4 w-4" /> Find & Replace
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
