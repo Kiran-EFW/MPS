@@ -8,6 +8,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { LoglineEditor } from '@/components/LoglineEditor';
 import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { TitlePageEditor, TitlePageContent } from '@/components/TitlePageEditor';
+import { NotesEditor } from '@/components/NotesEditor';
 import { parseScenes, parseCharacters, parseLocations } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
@@ -45,6 +46,7 @@ const RIGHT_PANE_STORAGE_KEY = 'mindpaperscreen-right-pane';
 const LOGLINE_STORAGE_KEY = 'mindpaperscreen-logline';
 const SYNOPSIS_STORAGE_KEY = 'mindpaperscreen-synopsis';
 const TITLE_PAGE_STORAGE_KEY = 'mindpaperscreen-titlepage';
+const NOTES_STORAGE_KEY = 'mindpaperscreen-notes';
 
 interface PrintData {
   script: string;
@@ -62,6 +64,7 @@ const EditorPage = () => {
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
   const [loglineContent, setLoglineContent] = useState(() => localStorage.getItem(LOGLINE_STORAGE_KEY) || '');
   const [synopsisContent, setSynopsisContent] = useState(() => localStorage.getItem(SYNOPSIS_STORAGE_KEY) || '');
+  const [notesContent, setNotesContent] = useState(() => localStorage.getItem(NOTES_STORAGE_KEY) || '');
   const [titlePageContent, setTitlePageContent] = useState<TitlePageContent>(() => {
     const saved = localStorage.getItem(TITLE_PAGE_STORAGE_KEY);
     return saved ? JSON.parse(saved) : { title: '', author: '', contact: '' };
@@ -87,6 +90,7 @@ const EditorPage = () => {
   useEffect(() => { localStorage.setItem(LOGLINE_STORAGE_KEY, loglineContent); setLastSaved(new Date()); }, [loglineContent]);
   useEffect(() => { localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent); setLastSaved(new Date()); }, [synopsisContent]);
   useEffect(() => { localStorage.setItem(TITLE_PAGE_STORAGE_KEY, JSON.stringify(titlePageContent)); setLastSaved(new Date()); }, [titlePageContent]);
+  useEffect(() => { localStorage.setItem(NOTES_STORAGE_KEY, notesContent); setLastSaved(new Date()); }, [notesContent]);
 
   const handleSave = () => {
     setLastSaved(new Date());
@@ -168,7 +172,7 @@ const EditorPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const wordCount = [scriptContent, rightPaneContent, loglineContent, synopsisContent]
+  const wordCount = [scriptContent, rightPaneContent, loglineContent, synopsisContent, notesContent]
     .map((content) => content.trim().split(/\s+/).filter(Boolean).length)
     .reduce((sum, count) => sum + count, 0);
 
@@ -180,6 +184,8 @@ const EditorPage = () => {
         return <LoglineEditor content={loglineContent} setContent={setLoglineContent} />;
       case 'synopsis':
         return <SynopsisEditor content={synopsisContent} setContent={setSynopsisContent} />;
+      case 'notes':
+        return <NotesEditor content={notesContent} setContent={setNotesContent} />;
       case 'screenplay':
       default:
         return (
@@ -252,7 +258,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToTtlePage} />}
       </div>
     </>
   );

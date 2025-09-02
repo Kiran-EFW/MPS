@@ -1,7 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { FileText, Video, Users, MapPin, Notebook, History } from 'lucide-react';
+import { FileText, Video, Users, MapPin, Notebook } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
 
 interface SidebarProps {
@@ -54,12 +54,7 @@ export const Sidebar = ({
     {
       icon: Notebook,
       label: 'Notes',
-      content: [{ name: 'Research on 1920s fashion' }, { name: 'Dialogue ideas' }],
-    },
-    {
-      icon: History,
-      label: 'Workflow History',
-      content: [{ name: 'Saved 2 mins ago' }, { name: 'Edited Scene 1' }],
+      content: [{ name: 'Scratchpad', view: 'notes' }],
     },
   ];
 
@@ -94,7 +89,7 @@ export const Sidebar = ({
 
   return (
     <aside className="w-full h-full p-4 border-r bg-card text-card-foreground overflow-y-auto">
-      <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes', 'Characters', 'Locations']} className="w-full">
+      <Accordion type="multiple" defaultValue={['Project Navigator', 'Scenes', 'Characters', 'Locations', 'Notes']} className="w-full">
         {sidebarItems.map((item) => (
           <AccordionItem value={item.label} key={item.label}>
             <AccordionTrigger>
