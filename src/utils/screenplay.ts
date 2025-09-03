@@ -103,3 +103,18 @@ export const estimatePageCount = (script: string): number => {
   const count = Math.ceil(lines / LINES_PER_PAGE);
   return Math.max(1, count); // Ensure it's at least 1
 };
+
+export const estimateSceneLength = (sceneContent: string): string => {
+  const lines = sceneContent.split('\n').length;
+  const eighths = Math.round((lines / LINES_PER_PAGE) * 8);
+  if (eighths === 0) return "";
+  if (eighths < 8) {
+    return `${eighths}/8 pages`;
+  }
+  const pages = Math.floor(eighths / 8);
+  const remainder = eighths % 8;
+  if (remainder === 0) {
+    return `${pages} page${pages > 1 ? 's' : ''}`;
+  }
+  return `${pages} ${remainder}/8 pages`;
+};
