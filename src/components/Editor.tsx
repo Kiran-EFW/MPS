@@ -52,6 +52,49 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'j') {
+      event.preventDefault();
+      const textarea = event.currentTarget;
+      const { value, selectionStart } = textarea;
+
+      // Find the end of the line where the cursor is.
+      const lineEndIndex = value.indexOf('\n', selectionStart);
+      if (lineEndIndex === -1) return; // Last line, nothing to join.
+
+      // Find the start of the content on the next line, skipping whitespace and newlines.
+      let nextContentStartIndex = lineEndIndex + 1;
+      while (nextContentStartIndex < value.length && /\s/.test(value[nextContentStartIndex])) {
+        nextContentStartIndex++;
+      }
+
+      // If we're at the end, there's nothing to join.
+      if (nextContentStartIndex >= value.length) return;
+
+      // Find the end of the line that contains the next content.
+      const nextLineEndIndex = value.indexOf('\n', nextContentStartIndex);
+      const endOfNextLine = nextLineEndIndex === -1 ? value.length : nextLineEndIndex;
+
+      // Get the text from the next line.
+      const nextLineText = value.substring(nextContentStartIndex, endOfNextLine);
+
+      // Construct the new value.
+      const part1 = value.substring(0, lineEndIndex); // Text up to the end of the current line.
+      const part2 = value.substring(endOfNextLine); // Text after the next line.
+
+      // Join with a space.
+      const newContent = `${part1} ${nextLineText.trim()}${part2}`;
+      
+      setScriptContent(newContent);
+
+      // After state update, set cursor position.
+      setTimeout(() => {
+        textarea.focus();
+        const newCursorPos = lineEndIndex + 1;
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
+      return; // Stop further processing
+    }
+
     if (event.key === 'Tab') {
       event.preventDefault();
       const currentIndex = formats.indexOf(format);
