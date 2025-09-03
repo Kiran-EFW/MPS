@@ -23,6 +23,7 @@ interface FindAndReplaceDialogProps {
   setCaseSensitive: (value: boolean) => void;
   matchCount: number;
   onFindNext: () => void;
+  onFindPrevious: () => void;
   onReplace: () => void;
   onReplaceAll: () => void;
 }
@@ -38,6 +39,7 @@ export const FindAndReplaceDialog = ({
   setCaseSensitive,
   matchCount,
   onFindNext,
+  onFindPrevious,
   onReplace,
   onReplaceAll,
 }: FindAndReplaceDialogProps) => {
@@ -58,7 +60,7 @@ export const FindAndReplaceDialog = ({
           <DialogTitle>Find and Replace</DialogTitle>
           <DialogDescription>
             Search for text in your active document and replace it.
-          </Description>
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -101,6 +103,9 @@ export const FindAndReplaceDialog = ({
           )}
         </div>
         <DialogFooter>
+          <Button variant="outline" onClick={onFindPrevious}>
+            Find Previous
+          </Button>
           <Button variant="outline" onClick={onFindNext}>
             Find Next
           </Button>

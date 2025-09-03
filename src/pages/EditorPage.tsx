@@ -182,7 +182,26 @@ const EditorPage = () => {
     const textToSearch = caseSensitive ? scriptContent : scriptContent.toLowerCase();
     const termToFind = caseSensitive ? findValue : findValue.toLowerCase();
     let index = textToSearch.indexOf(termToFind, textarea.selectionEnd);
-    if (index === -1) { index = textToSearch.indexOf(termToFind); }
+    if (index === -1) { // Wrap around
+      index = textToSearch.indexOf(termToFind);
+    }
+    if (index !== -1) {
+      textarea.focus();
+      textarea.setSelectionRange(index, index + findValue.length);
+    } else {
+      showError(`"${findValue}" not found.`);
+    }
+  };
+
+  const findPrevious = () => {
+    const textarea = editorRef.current;
+    if (!textarea || !findValue) return;
+    const textToSearch = caseSensitive ? scriptContent : scriptContent.toLowerCase();
+    const termToFind = caseSensitive ? findValue : findValue.toLowerCase();
+    let index = textToSearch.lastIndexOf(termToFind, textarea.selectionStart - 1);
+    if (index === -1) { // Wrap around
+      index = textToSearch.lastIndexOf(termToFind);
+    }
     if (index !== -1) {
       textarea.focus();
       textarea.setSelectionRange(index, index + findValue.length);
@@ -338,6 +357,7 @@ const EditorPage = () => {
           setCaseSensitive={setCaseSensitive}
           matchCount={matchCount}
           onFindNext={findNext}
+          onFindPrevious={findPrevious}
           onReplace={replace}
           onReplaceAll={replaceAll}
         />
