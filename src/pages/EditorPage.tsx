@@ -83,6 +83,8 @@ const EditorPage = () => {
   const [replaceValue, setReplaceValue] = useState('');
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [matchCount, setMatchCount] = useState(0);
+  const [matches, setMatches] = useState<number[]>([]);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
 
   const scenes = useMemo(() => parseScenes(scriptContent), [scriptContent]);
   const characters = useMemo(() => parseCharacters(scriptContent), [scriptContent]);
@@ -118,13 +120,21 @@ const EditorPage = () => {
   useEffect(() => {
     if (!findValue) {
       setMatchCount(0);
+      setMatches([]);
+      setCurrentMatchIndex(0);
       return;
     }
     const flags = caseSensitive ? 'g' : 'gi';
     const escapedFindValue = findValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(escapedFindValue, flags);
-    const matches = scriptContent.match(regex);
-    setMatchCount(matches ? matches.length : 0);
+    const foundMatches: number[] = [];
+    let match;
+    while ((match = regex.exec(scriptContent)) !== null) {
+      foundMatches.push(match.index);
+    }
+    setMatches(foundMatches);
+    setMatchCount(foundMatches.length);
+    setCurrentMatchIndex(0);
   }, [findValue, caseSensitive, scriptContent]);
 
   // Effect to handle global keyboard shortcuts
@@ -176,38 +186,34 @@ const EditorPage = () => {
     }, 0);
   };
 
-  const findNext = () => {
+  const selectMatch = (index: number) => {
     const textarea = editorRef.current;
-    if (!textarea || !findValue) return;
-    const textToSearch = caseSensitive ? scriptContent : scriptContent.toLowerCase();
-    const termToFind = caseSensitive ? findValue : findValue.toLowerCase();
-    let index = textToSearch.indexOf(termToFind, textarea.selectionEnd);
-    if (index === -1) { // Wrap around
-      index = textToSearch.indexOf(termToFind);
-    }
-    if (index !== -1) {
+    if (!textarea || matches.length === 0) return;
+    const matchStartIndex = matches[index - 1];
+    if (matchStartIndex !== undefined) {
       textarea.focus();
-      textarea.setSelectionRange(index, index + findValue.length);
-    } else {
-      showError(`"${findValue}" not found.`);
+      textarea.setSelectionRange(matchStartIndex, matchStartIndex + findValue.length);
     }
   };
 
-  const findPrevious = () => {
-    const textarea = editorRef.current;
-    if (!textarea || !findValue) return;
-    const textToSearch = caseSensitive ? scriptContent : scriptContent.toLowerCase();
-    const termToFind = caseSensitive ? findValue : findValue.toLowerCase();
-    let index = textToSearch.lastIndexOf(termToFind, textarea.selectionStart - 1);
-    if (index === -1) { // Wrap around
-      index = textToSearch.lastIndexOf(termToFind);
-    }
-    if (index !== -1) {
-      textarea.focus();
-      textarea.setSelectionRange(index, index + findValue.length);
-    } else {
+  const findNext = () => {
+    if (matches.length === 0) {
       showError(`"${findValue}" not found.`);
+      return;
     }
+    const nextIndex = currentMatchIndex >= matches.length ? 1 : currentMatchIndex + 1;
+    setCurrentMatchIndex(nextIndex);
+    selectMatch(nextIndex);
+  };
+
+  const findPrevious = () => {
+    if (matches.length === 0) {
+      showError(`"${findValue}" not found.`);
+      return;
+    }
+    const prevIndex = currentMatchIndex <= 1 ? matches.length : currentMatchIndex - 1;
+    setCurrentMatchIndex(prevIndex);
+    selectMatch(prevIndex);
   };
   
   const replace = () => {
@@ -221,15 +227,8 @@ const EditorPage = () => {
     if (selectionToCompare === findToCompare) {
       const newContent = scriptContent.substring(0, start) + replaceValue + scriptContent.substring(end);
       setScriptContent(newContent);
-      setTimeout(() => {
-        const nextTextarea = editorRef.current;
-        if (nextTextarea) {
-          const newCursorPos = start + replaceValue.length;
-          nextTextarea.focus();
-          nextTextarea.setSelectionRange(newCursorPos, newCursorPos);
-          findNext();
-        }
-      }, 0);
+      // The useEffect will re-calculate matches. We can try to find the next one after the content updates.
+      setTimeout(() => findNext(), 0);
     } else {
       findNext();
     }
@@ -356,6 +355,7 @@ const EditorPage = () => {
           caseSensitive={caseSensitive}
           setCaseSensitive={setCaseSensitive}
           matchCount={matchCount}
+          currentMatchIndex={currentMatchIndex}
           onFindNext={findNext}
           onFindPrevious={findPrevious}
           onReplace={replace}

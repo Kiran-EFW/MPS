@@ -22,6 +22,7 @@ interface FindAndReplaceDialogProps {
   caseSensitive: boolean;
   setCaseSensitive: (value: boolean) => void;
   matchCount: number;
+  currentMatchIndex: number;
   onFindNext: () => void;
   onFindPrevious: () => void;
   onReplace: () => void;
@@ -38,6 +39,7 @@ export const FindAndReplaceDialog = ({
   caseSensitive,
   setCaseSensitive,
   matchCount,
+  currentMatchIndex,
   onFindNext,
   onFindPrevious,
   onReplace,
@@ -97,9 +99,16 @@ export const FindAndReplaceDialog = ({
             </Label>
           </div>
           {findValue && (
-            <p className="text-sm text-muted-foreground">
-              {matchCount} {matchCount === 1 ? 'match' : 'matches'} found.
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {matchCount} {matchCount === 1 ? 'match' : 'matches'} found.
+              </p>
+              {matchCount > 0 && currentMatchIndex > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {currentMatchIndex} / {matchCount}
+                </p>
+              )}
+            </div>
           )}
         </div>
         <DialogFooter>
