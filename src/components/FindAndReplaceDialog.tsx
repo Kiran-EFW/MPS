@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -40,6 +41,16 @@ export const FindAndReplaceDialog = ({
   onReplace,
   onReplaceAll,
 }: FindAndReplaceDialogProps) => {
+  const findInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        findInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -47,7 +58,7 @@ export const FindAndReplaceDialog = ({
           <DialogTitle>Find and Replace</DialogTitle>
           <DialogDescription>
             Search for text in your active document and replace it.
-          </DialogDescription>
+          </Description>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -56,6 +67,7 @@ export const FindAndReplaceDialog = ({
             </Label>
             <Input
               id="find"
+              ref={findInputRef}
               value={findValue}
               onChange={(e) => setFindValue(e.target.value)}
               className="col-span-3"

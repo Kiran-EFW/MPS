@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { showSuccess, showError } from '@/utils/toast';
-import { exportToMarkdown } from '@/utils/export';
+import { exportToMarkdown, exportToFountain } from '@/utils/export';
 
 interface HeaderProps {
   onFindClick: () => void;
@@ -27,6 +27,11 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scrip
     if (format === 'Markdown') {
       exportToMarkdown(scriptContent, scriptTitle);
       showSuccess('Exporting to Markdown...');
+      return;
+    }
+    if (format === 'Fountain') {
+      exportToFountain(scriptContent, scriptTitle);
+      showSuccess('Exporting to Fountain...');
       return;
     }
     showError(`${format} export is a Pro feature. Please upgrade.`);
@@ -66,6 +71,7 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scrip
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleExport('.fdx (Final Draft)')}>.fdx (Final Draft)</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport('.celtx (Celtx)')}>.celtx (Celtx)</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('Fountain')}>Fountain (.fountain)</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport('Markdown')}>Markdown</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

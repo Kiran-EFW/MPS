@@ -50,3 +50,52 @@ export const exportToMarkdown = (script: string, title: string) => {
   const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
   triggerDownload(markdown, `${safeTitle || 'script'}.md`, 'text/markdown');
 };
+
+export const exportToFountain = (script: string, title: string) => {
+  const parsedLines = parseScript(script);
+  let fountain = `Title: ${title || 'Untitled Screenplay'}\n\n`;
+
+  parsedLines.forEach((line, index) => {
+    const prevLine = parsedLines[index - 1];
+
+    // Fountain relies on blank lines for separation
+    if (line.type === 'scene' && prevLine?.type !== 'empty') {
+      fountain += '\n';
+    }
+    if (line.type === 'character' && prevLine?.type !== 'empty') {
+      fountain += '\n';
+    }
+
+    switch (line.type) {
+      case 'scene':
+        fountain += `${line.text.toUpperCase()}\n`;
+        break;
+      case 'action':
+        fountain += `${line.text}\n`;
+        break;
+      case 'character':
+        fountain += `${line.text.toUpperCase()}\n`;
+        break;
+      case 'dialogue':
+        fountain += `${line.text}\n`;
+        break;
+      case 'parenthetical':
+        fountain += `${line.text}\n`;
+        break;
+      case 'transition':
+        fountain += `> ${line.text.toUpperCase()}\n`;
+        break;
+      case 'empty':
+        // Avoid multiple consecutive blank lines
+        if (prevLine?.type !== 'empty') {
+          fountain += '\n';
+        }
+        break;
+      default:
+        fountain += `${line.text}\n`;
+    }
+  });
+
+  const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  triggerDownload(fountain, `${safeTitle || 'script'}.fountain`, 'text/plain');
+};
