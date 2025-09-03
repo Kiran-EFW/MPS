@@ -340,7 +340,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToTtlePage} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
       </div>
     </>
   );
