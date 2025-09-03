@@ -68,39 +68,53 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
         const lines = textUpToCursor.split('\n');
         const currentLine = (lines[lines.length - 2] || '').trim();
 
+        // From empty line -> action
         if (currentLine.length === 0) {
           setFormat('action');
           return;
         }
 
+        // From Scene Heading -> action
         if (currentLine.startsWith('INT.') || currentLine.startsWith('EXT.')) {
           setFormat('action');
           return;
         }
 
+        // From Transition -> scene
         if (format === 'transition' || (currentLine.endsWith(':') && currentLine === currentLine.toUpperCase())) {
           setFormat('scene');
           return;
         }
 
+        // From Character -> dialogue
         if (format === 'character') {
           setFormat('dialogue');
           return;
         }
 
+        // From Dialogue/Parenthetical -> character
         if (format === 'dialogue' || format === 'parenthetical') {
           setFormat('character');
           return;
         }
 
-        if (format === 'action' && currentLine.length > 0 && currentLine === currentLine.toUpperCase() && !currentLine.startsWith('(') && !currentLine.endsWith(')')) {
-          setFormat('dialogue');
-          return;
+        // From Action -> maybe Character (then next is dialogue)
+        if (format === 'action') {
+          const characterCandidate = currentLine.replace(/\(.*\)/g, '').trim();
+          if (
+            characterCandidate.length > 0 &&
+            characterCandidate === characterCandidate.toUpperCase() &&
+            characterCandidate.split(' ').length <= 5 && // Character names are usually short
+            !characterCandidate.endsWith(':') // Not a transition
+          ) {
+            // The line just typed was a character, so the next format is dialogue
+            setFormat('dialogue');
+            return;
+          }
         }
 
-        if (format === 'action') {
-          setFormat('action');
-        }
+        // Default to action
+        setFormat('action');
       }, 0);
     }
   };
