@@ -1,4 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Users } from 'lucide-react';
 import { parseScriptToScenes } from '@/utils/screenplay';
 
 interface OutlineEditorProps {
@@ -34,9 +36,17 @@ export const OutlineEditor = ({ scriptContent, onSceneClick }: OutlineEditorProp
                 <CardTitle className="text-base font-mono">{index + 1}. {scene.heading}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap font-mono leading-relaxed">
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap font-mono leading-relaxed mb-4">
                   {summarizeContent(scene.content)}
                 </p>
+                {scene.characters.length > 0 && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    {scene.characters.map(char => (
+                      <Badge key={char} variant="secondary">{char}</Badge>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
