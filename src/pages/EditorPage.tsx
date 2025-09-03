@@ -72,7 +72,7 @@ const EditorPage = () => {
   });
 
   const [isIndianFormat, setIsIndianFormat] = useState(false);
-  const [lastSaved, setLastSaved] = useState(new Date());
+  const [saveStatus, setSaveStatus] = useState<'saving' | 'saved'>('saved');
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   // State for Find and Replace
@@ -93,12 +93,23 @@ const EditorPage = () => {
     }
   }, [dataToPrint]);
 
-  useEffect(() => { localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent); setLastSaved(new Date()); }, [scriptContent]);
-  useEffect(() => { localStorage.setItem(RIGHT_PANE_STORAGE_KEY, rightPaneContent); setLastSaved(new Date()); }, [rightPaneContent]);
-  useEffect(() => { localStorage.setItem(LOGLINE_STORAGE_KEY, loglineContent); setLastSaved(new Date()); }, [loglineContent]);
-  useEffect(() => { localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent); setLastSaved(new Date()); }, [synopsisContent]);
-  useEffect(() => { localStorage.setItem(TITLE_PAGE_STORAGE_KEY, JSON.stringify(titlePageContent)); setLastSaved(new Date()); }, [titlePageContent]);
-  useEffect(() => { localStorage.setItem(NOTES_STORAGE_KEY, notesContent); setLastSaved(new Date()); }, [notesContent]);
+  // Debounced auto-save effect
+  useEffect(() => {
+    setSaveStatus('saving');
+    const handler = setTimeout(() => {
+      localStorage.setItem(SCRIPT_STORAGE_KEY, scriptContent);
+      localStorage.setItem(RIGHT_PANE_STORAGE_KEY, rightPaneContent);
+      localStorage.setItem(LOGLINE_STORAGE_KEY, loglineContent);
+      localStorage.setItem(SYNOPSIS_STORAGE_KEY, synopsisContent);
+      localStorage.setItem(TITLE_PAGE_STORAGE_KEY, JSON.stringify(titlePageContent));
+      localStorage.setItem(NOTES_STORAGE_KEY, notesContent);
+      setSaveStatus('saved');
+    }, 1500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [scriptContent, rightPaneContent, loglineContent, synopsisContent, titlePageContent, notesContent]);
 
   // Calculate match count for Find and Replace
   useEffect(() => {
@@ -112,11 +123,6 @@ const EditorPage = () => {
     const matches = scriptContent.match(regex);
     setMatchCount(matches ? matches.length : 0);
   }, [findValue, caseSensitive, scriptContent]);
-
-  const handleSave = () => {
-    setLastSaved(new Date());
-    showSuccess('Project saved!');
-  };
 
   const handleSearchAndNavigate = (searchTerm: string) => {
     setActiveView('screenplay');
@@ -202,11 +208,6 @@ const EditorPage = () => {
     setIsFindOpen(false);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => { showSuccess('Project auto-saved!'); }, 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   const wordCount = [scriptContent, rightPaneContent, loglineContent, synopsisContent, notesContent]
     .map((content) => content.trim().split(/\s+/).filter(Boolean).length)
     .reduce((sum, count) => sum + count, 0);
@@ -286,7 +287,7 @@ const EditorPage = () => {
             </ResizablePanelGroup>
           )}
         </div>
-        <Footer wordCount={wordCount} pageCount={pageCount} onSave={handleSave} lastSaved={lastSaved} />
+        <Footer wordCount={wordCount} pageCount={pageCount} saveStatus={saveStatus} />
         <FindAndReplaceDialog
           isOpen={isFindOpen}
           onClose={() => setIsFindOpen(false)}
@@ -304,7 +305,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToTtlePage} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
       </div>
     </>
   );

@@ -1,16 +1,13 @@
-import { Save, Clock, Film } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock, CheckCircle2, Film } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
 
 interface FooterProps {
   wordCount: number;
   pageCount: number;
-  lastSaved: Date;
-  onSave: () => void;
+  saveStatus: 'saving' | 'saved';
 }
 
-export const Footer = ({ wordCount, pageCount, lastSaved, onSave }: FooterProps) => {
+export const Footer = ({ wordCount, pageCount, saveStatus }: FooterProps) => {
   const screenTime = pageCount; // 1 page ≈ 1 minute of screen time
 
   return (
@@ -25,13 +22,17 @@ export const Footer = ({ wordCount, pageCount, lastSaved, onSave }: FooterProps)
         <Badge variant="destructive">10-page limit for free users</Badge>
       </div>
       <div className="flex items-center gap-4 flex-wrap justify-end">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Clock className="h-4 w-4" />
-          <span>Auto-saved: {format(lastSaved, 'p')}</span>
-        </div>
-        <Button variant="outline" size="sm" onClick={onSave}>
-          <Save className="mr-2 h-4 w-4" /> Save Now
-        </Button>
+        {saveStatus === 'saving' ? (
+          <div className="flex items-center gap-2 text-muted-foreground animate-pulse">
+            <Clock className="h-4 w-4" />
+            <span>Saving...</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-green-500">
+            <CheckCircle2 className="h-4 w-4" />
+            <span>All changes saved</span>
+          </div>
+        )}
       </div>
     </footer>
   );
