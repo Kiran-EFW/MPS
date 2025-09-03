@@ -18,6 +18,18 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: [
+          'Noto Sans',
+          'Noto Sans Devanagari', // For Hindi, Marathi
+          'Noto Sans Bengali',
+          'Noto Sans Tamil',
+          'Noto Sans Telugu',
+          'Noto Sans Kannada',
+          'Noto Sans Malayalam',
+          'sans-serif', // Fallback
+        ],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
