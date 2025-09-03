@@ -16,6 +16,8 @@ import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { PrintPreview } from '@/components/PrintPreview';
+import { Minimize } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -60,6 +62,7 @@ const EditorPage = () => {
   const isMobile = useIsMobile();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [dataToPrint, setDataToPrint] = useState<PrintData | null>(null);
+  const [isDistractionFree, setIsDistractionFree] = useState(false);
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
@@ -123,6 +126,17 @@ const EditorPage = () => {
     const matches = scriptContent.match(regex);
     setMatchCount(matches ? matches.length : 0);
   }, [findValue, caseSensitive, scriptContent]);
+
+  // Effect to handle Escape key for distraction-free mode
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsDistractionFree(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSearchAndNavigate = (searchTerm: string) => {
     setActiveView('screenplay');
@@ -256,30 +270,39 @@ const EditorPage = () => {
   return (
     <>
       <div id="app-container" className="flex flex-col h-screen w-full bg-background text-foreground">
-        <Header
-          onFindClick={() => setIsFindOpen(true)}
-          onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
-          onPrint={() => setDataToPrint({ script: scriptContent, titlePage: titlePageContent })}
-          scriptContent={scriptContent}
-          scriptTitle={titlePageContent.title}
-        />
+        {!isDistractionFree && (
+          <Header
+            onFindClick={() => setIsFindOpen(true)}
+            onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
+            onPrint={() => setDataToPrint({ script: scriptContent, titlePage: titlePageContent })}
+            scriptContent={scriptContent}
+            scriptTitle={titlePageContent.title}
+            onEnterDistractionFree={() => setIsDistractionFree(true)}
+          />
+        )}
         <div className="flex-1 flex overflow-hidden">
           {isMobile ? (
             <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
               {renderActiveView()}
-              <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-                <SheetContent side="left" className="p-0 w-[80%] max-w-sm">
-                  {sidebarComponent}
-                </SheetContent>
-              </Sheet>
+              {!isDistractionFree && (
+                <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+                  <SheetContent side="left" className="p-0 w-[80%] max-w-sm">
+                    {sidebarComponent}
+                  </SheetContent>
+                </Sheet>
+              )}
             </main>
           ) : (
             <ResizablePanelGroup direction="horizontal" className="flex flex-1 overflow-hidden">
-              <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-                {sidebarComponent}
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={75}>
+              {!isDistractionFree && (
+                <>
+                  <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+                    {sidebarComponent}
+                  </ResizablePanel>
+                  <ResizableHandle withHandle />
+                </>
+              )}
+              <ResizablePanel defaultSize={isDistractionFree ? 100 : 75}>
                 <main className="flex-1 flex flex-col overflow-hidden h-full p-4">
                   {renderActiveView()}
                 </main>
@@ -287,7 +310,19 @@ const EditorPage = () => {
             </ResizablePanelGroup>
           )}
         </div>
-        <Footer wordCount={wordCount} pageCount={pageCount} saveStatus={saveStatus} />
+        {!isDistractionFree && (
+          <Footer wordCount={wordCount} pageCount={pageCount} saveStatus={saveStatus} />
+        )}
+        
+        {isDistractionFree && (
+          <div className="absolute top-4 right-4 z-50">
+            <Button variant="outline" size="icon" onClick={() => setIsDistractionFree(false)}>
+              <Minimize className="h-4 w-4" />
+              <span className="sr-only">Exit Distraction-Free Mode</span>
+            </Button>
+          </div>
+        )}
+
         <FindAndReplaceDialog
           isOpen={isFindOpen}
           onClose={() => setIsFindOpen(false)}
@@ -305,7 +340,7 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
+        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToTtlePage} />}
       </div>
     </>
   );

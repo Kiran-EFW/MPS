@@ -1,4 +1,4 @@
-import { FileDown, Languages, Globe, Search, Menu } from 'lucide-react';
+import { FileDown, Languages, Globe, Search, Menu, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -11,9 +11,10 @@ interface HeaderProps {
   onPrint: () => void;
   scriptContent: string;
   scriptTitle: string;
+  onEnterDistractionFree: () => void;
 }
 
-export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scriptTitle }: HeaderProps) => {
+export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scriptTitle, onEnterDistractionFree }: HeaderProps) => {
   const handleExport = (format: string) => {
     if (format === 'Print') {
       onPrint();
@@ -99,6 +100,10 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scrip
           </DropdownMenuContent>
         </DropdownMenu>
         <ThemeToggle />
+        <Button variant="outline" size="icon" onClick={onEnterDistractionFree}>
+          <Maximize className="h-4 w-4" />
+          <span className="sr-only">Enter Distraction-Free Mode</span>
+        </Button>
       </div>
     </header>
   );
