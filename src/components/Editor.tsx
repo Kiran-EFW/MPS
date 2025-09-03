@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,14 @@ interface EditorProps {
 }
 
 const formats = ['scene', 'action', 'character', 'dialogue', 'parenthetical', 'transition'];
+const formatMap = [
+  { name: 'scene', label: 'Scene Heading', shortcut: '1' },
+  { name: 'action', label: 'Action', shortcut: '2' },
+  { name: 'character', label: 'Character', shortcut: '3' },
+  { name: 'dialogue', label: 'Dialogue', shortcut: '4' },
+  { name: 'parenthetical', label: 'Parenthetical', shortcut: '5' },
+  { name: 'transition', label: 'Transition', shortcut: '6' },
+];
 
 export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   scriptContent,
@@ -25,6 +33,23 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   setIsIndianFormat,
 }, ref) => {
   const [format, setFormat] = useState('action');
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        const shortcut = parseInt(event.key, 10);
+        if (shortcut >= 1 && shortcut <= 6) {
+          event.preventDefault();
+          setFormat(formats[shortcut - 1]);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Tab') {
@@ -91,12 +116,12 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
             if (value) setFormat(value);
           }}
         >
-          <ToggleGroupItem value="scene">Scene Heading</ToggleGroupItem>
-          <ToggleGroupItem value="action">Action</ToggleGroupItem>
-          <ToggleGroupItem value="character">Character</ToggleGroupItem>
-          <ToggleGroupItem value="dialogue">Dialogue</ToggleGroupItem>
-          <ToggleGroupItem value="parenthetical">Parenthetical</ToggleGroupItem>
-          <ToggleGroupItem value="transition">Transition</ToggleGroupItem>
+          {formatMap.map(item => (
+            <ToggleGroupItem value={item.name} key={item.name} className="flex items-center gap-2">
+              {item.label}
+              <span className="text-xs text-muted-foreground ml-1">(Ctrl+{item.shortcut})</span>
+            </ToggleGroupItem>
+          ))}
         </ToggleGroup>
         <div className="flex items-center space-x-2">
           <Label htmlFor="layout-switch">Indian Cinema Format</Label>

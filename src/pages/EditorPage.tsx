@@ -127,11 +127,15 @@ const EditorPage = () => {
     setMatchCount(matches ? matches.length : 0);
   }, [findValue, caseSensitive, scriptContent]);
 
-  // Effect to handle Escape key for distraction-free mode
+  // Effect to handle global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsDistractionFree(false);
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault();
+        setIsFindOpen(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
