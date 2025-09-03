@@ -39,6 +39,17 @@ export const parseScriptToScenes = (script: string): Scene[] => {
   return scenes;
 };
 
+export const splitScriptByScenes = (script: string): string[] => {
+  if (!script.trim()) return [];
+  // Use a regex with a positive lookahead to split the script by scene headings, keeping the headings in the resulting chunks.
+  const sceneChunks = script.split(/(?=^\s*(?:INT\.|EXT\.))/m);
+  // The first element can sometimes be whitespace or content before the first scene. We'll filter out empty chunks.
+  if (sceneChunks[0] && sceneChunks[0].trim() === '') {
+    sceneChunks.shift();
+  }
+  return sceneChunks.filter(chunk => chunk.trim() !== '');
+};
+
 export const parseScenes = (script: string): string[] => {
   if (!script) return [];
   const lines = script.split('\n');

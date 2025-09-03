@@ -10,7 +10,7 @@ import { SynopsisEditor } from '@/components/SynopsisEditor';
 import { TitlePageEditor, TitlePageContent } from '@/components/TitlePageEditor';
 import { NotesEditor } from '@/components/NotesEditor';
 import { OutlineEditor } from '@/components/OutlineEditor';
-import { parseScenes, parseCharacters, parseLocations, estimatePageCount } from '@/utils/screenplay';
+import { parseScenes, parseCharacters, parseLocations, estimatePageCount, splitScriptByScenes } from '@/utils/screenplay';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { FindAndReplaceDialog } from '@/components/FindAndReplaceDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,6 +18,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { PrintPreview } from '@/components/PrintPreview';
 import { Minimize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { arrayMove } from '@dnd-kit/sortable';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -244,6 +245,16 @@ const EditorPage = () => {
     setIsFindOpen(false);
   };
 
+  const handleReorderScenes = (oldIndex: number, newIndex: number) => {
+    const sceneChunks = splitScriptByScenes(scriptContent);
+    if (sceneChunks.length > 1) {
+      const reorderedChunks = arrayMove(sceneChunks, oldIndex, newIndex);
+      const newScriptContent = reorderedChunks.join('');
+      setScriptContent(newScriptContent);
+      showSuccess('Scenes reordered successfully.');
+    }
+  };
+
   const wordCount = [scriptContent, rightPaneContent, loglineContent, synopsisContent, notesContent]
     .map((content) => content.trim().split(/\s+/).filter(Boolean).length)
     .reduce((sum, count) => sum + count, 0);
@@ -259,7 +270,7 @@ const EditorPage = () => {
       case 'notes':
         return <NotesEditor content={notesContent} setContent={setNotesContent} />;
       case 'outline':
-        return <OutlineEditor scriptContent={scriptContent} onSceneClick={handleSceneClick} />;
+        return <OutlineEditor scriptContent={scriptContent} onSceneClick={handleSceneClick} onReorderScenes={handleReorderScenes} />;
       case 'screenplay':
       default:
         return (
