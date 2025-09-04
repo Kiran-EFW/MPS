@@ -38,6 +38,52 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
 }, ref) => {
   const [format, setFormat] = useState('action');
 
+  const handleFormatChange = (newFormat: string) => {
+    if (!newFormat) return;
+
+    const textarea = (ref as React.RefObject<HTMLTextAreaElement>)?.current;
+    if (textarea) {
+        const { selectionStart, selectionEnd } = textarea;
+
+        if (selectionStart !== selectionEnd) {
+            // There is a selection, so we format it.
+            const selectedText = scriptContent.substring(selectionStart, selectionEnd);
+            let formattedText = selectedText;
+
+            switch (newFormat) {
+                case 'scene':
+                case 'character':
+                case 'transition':
+                    formattedText = selectedText.toUpperCase();
+                    break;
+                case 'parenthetical':
+                    // remove existing parentheses before adding new ones
+                    formattedText = `(${selectedText.replace(/^\s*\(\s*|\s*\)\s*$/g, '')})`;
+                    break;
+                case 'action':
+                case 'dialogue':
+                    // For action and dialogue, the parser determines the type based on context.
+                    // No text transformation is needed.
+                    break;
+            }
+
+            const newContent = 
+                scriptContent.substring(0, selectionStart) +
+                formattedText +
+                scriptContent.substring(selectionEnd);
+            
+            setScriptContent(newContent);
+
+            // After updating, re-select the formatted text.
+            setTimeout(() => {
+                textarea.focus();
+                textarea.setSelectionRange(selectionStart, selectionStart + formattedText.length);
+            }, 0);
+        }
+    }
+    setFormat(newFormat);
+  };
+
   const handleSpeechResult = useCallback((transcript: string) => {
     const textarea = (ref as React.RefObject<HTMLTextAreaElement>)?.current;
     if (textarea) {
@@ -174,9 +220,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
           type="single"
           className="flex-wrap justify-start"
           value={format}
-          onValueChange={(value) => {
-            if (value) setFormat(value);
-          }}
+          onValueChange={handleFormatChange}
         >
           {formatMap.map(item => (
             <ToggleGroupItem value={item.name} key={item.name} className="flex items-center gap-2">
