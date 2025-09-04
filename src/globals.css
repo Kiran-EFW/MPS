@@ -113,13 +113,13 @@
     /* Base, no extra indent */
   }
   .editor-character {
-    padding-left: 20ch;
+    padding-left: 22ch;
     text-transform: uppercase;
     margin-top: 0.5rem;
   }
   .editor-dialogue {
     padding-left: 10ch;
-    padding-right: 5ch;
+    padding-right: 15ch;
   }
   .editor-parenthetical {
     padding-left: 16ch;
