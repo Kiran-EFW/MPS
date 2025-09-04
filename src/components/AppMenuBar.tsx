@@ -23,6 +23,7 @@ interface AppMenuBarProps {
   titlePageContent: TitlePageContent;
   onEnterDistractionFree: () => void;
   onViewChange: (view: string) => void;
+  onLanguageChange: (code: string, name: string) => void;
 }
 
 const languages = [
@@ -40,7 +41,7 @@ const languages = [
   { code: 'de-DE', name: 'German' },
 ];
 
-export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onViewChange }: AppMenuBarProps) => {
+export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onViewChange, onLanguageChange }: AppMenuBarProps) => {
   const { setTheme } = useTheme();
 
   const handleExport = (format: string) => {
@@ -144,6 +145,22 @@ export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageConte
           <MenubarItem onClick={() => onViewChange('logline')}>Logline</MenubarItem>
           <MenubarItem onClick={() => onViewChange('synopsis')}>Synopsis</MenubarItem>
           <MenubarItem onClick={() => onViewChange('notes')}>Notes</MenubarItem>
+        </MenubarContent>
+      </MenubarMenu>
+      
+      <MenubarMenu>
+        <MenubarTrigger>Language</MenubarTrigger>
+        <MenubarContent>
+          <MenubarSub>
+            <MenubarSubTrigger>Speech-to-Text Language</MenubarSubTrigger>
+            <MenubarSubContent>
+              {languages.map((lang) => (
+                <MenubarItem key={lang.code} onClick={() => onLanguageChange(lang.code, lang.name)}>
+                  {lang.name}
+                </MenubarItem>
+              ))}
+            </MenubarSubContent>
+          </MenubarSub>
         </MenubarContent>
       </MenubarMenu>
 
