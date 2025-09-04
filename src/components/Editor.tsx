@@ -38,6 +38,39 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
 }, ref) => {
   const [format, setFormat] = useState('action');
 
+  const handleScriptChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const textarea = event.currentTarget;
+    const { value, selectionStart } = textarea;
+
+    // Find the start and end of the current line based on cursor position
+    const lineStartIndex = value.lastIndexOf('\n', selectionStart - 1) + 1;
+    let lineEndIndex = value.indexOf('\n', selectionStart);
+    if (lineEndIndex === -1) {
+      lineEndIndex = value.length;
+    }
+    
+    const currentLine = value.substring(lineStartIndex, lineEndIndex);
+
+    // Check if the current format requires uppercasing and if the line isn't already uppercase
+    if (['scene', 'character', 'transition'].includes(format) && currentLine !== currentLine.toUpperCase()) {
+      const uppercasedLine = currentLine.toUpperCase();
+      const newContent = value.substring(0, lineStartIndex) + uppercasedLine + value.substring(lineEndIndex);
+      
+      setScriptContent(newContent);
+
+      // After the state updates and re-renders, restore the cursor position.
+      setTimeout(() => {
+        const ta = (ref as React.RefObject<HTMLTextAreaElement>)?.current;
+        if (ta) {
+          ta.focus();
+          ta.setSelectionRange(selectionStart, selectionStart);
+        }
+      }, 0);
+    } else {
+      setScriptContent(value);
+    }
+  };
+
   const handleFormatChange = (newFormat: string) => {
     if (!newFormat) return;
 
@@ -290,7 +323,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
                 placeholder="Video cues, actions..."
                 className="h-full w-full resize-none text-base font-mono leading-relaxed p-4 rounded-md border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 value={scriptContent}
-                onChange={(e) => setScriptContent(e.target.value)}
+                onChange={handleScriptChange}
                 onKeyDown={handleKeyDown}
               />
             </ResizablePanel>
@@ -310,7 +343,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
             placeholder="Start writing your screenplay..."
             className="w-full h-full resize-none text-base font-mono leading-relaxed p-4 rounded-md border"
             value={scriptContent}
-            onChange={(e) => setScriptContent(e.target.value)}
+            onChange={handleScriptChange}
             onKeyDown={handleKeyDown}
           />
         )}
