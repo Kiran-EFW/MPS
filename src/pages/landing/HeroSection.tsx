@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Typewriter } from 'lucide-react';
+import { Keyboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const HeroSection = () => {
   return (
     <section className="container flex flex-col items-center justify-center text-center py-20 md:py-32">
-      <Typewriter className="h-16 w-16 mb-6 text-primary" />
+      <Keyboard className="h-16 w-16 mb-6 text-primary" />
       <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-4">
         Mind to Paper, Paper to Screen
       </h2>
