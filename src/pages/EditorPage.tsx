@@ -319,6 +319,7 @@ const EditorPage = () => {
             titlePageContent={titlePageContent}
             onEnterDistractionFree={() => setIsDistractionFree(true)}
             onLanguageChange={handleLanguageChange}
+            onViewChange={setActiveView}
           />
         )}
         <div className="flex-1 flex overflow-hidden">
@@ -376,6 +377,7 @@ const EditorPage = () => {
           matchCount={matchCount}
           currentMatchIndex={currentMatchIndex}
           onFindNext={findNext}
+  
           onFindPrevious={findPrevious}
           onReplace={replace}
           onReplaceAll={replaceAll}
