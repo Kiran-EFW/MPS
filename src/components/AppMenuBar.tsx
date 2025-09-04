@@ -24,6 +24,7 @@ interface AppMenuBarProps {
   onEnterDistractionFree: () => void;
   onViewChange: (view: string) => void;
   onLanguageChange: (code: string, name: string) => void;
+  onShortcutsClick: () => void;
 }
 
 const languages = [
@@ -41,7 +42,7 @@ const languages = [
   { code: 'de-DE', name: 'German' },
 ];
 
-export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onViewChange, onLanguageChange }: AppMenuBarProps) => {
+export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onViewChange, onLanguageChange, onShortcutsClick }: AppMenuBarProps) => {
   const { setTheme } = useTheme();
 
   const handleExport = (format: string) => {
@@ -186,7 +187,7 @@ export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageConte
         <MenubarTrigger>Help</MenubarTrigger>
         <MenubarContent>
           <MenubarItem onClick={() => showPlaceholder('Documentation')}>Documentation</MenubarItem>
-          <MenubarItem onClick={() => showPlaceholder('Keyboard Shortcuts')}>Keyboard Shortcuts</MenubarItem>
+          <MenubarItem onClick={onShortcutsClick}>Keyboard Shortcuts</MenubarItem>
           <MenubarItem onClick={() => showPlaceholder('About MindPaperScreen')}>About MindPaperScreen</MenubarItem>
         </MenubarContent>
       </MenubarMenu>

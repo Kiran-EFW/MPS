@@ -19,6 +19,7 @@ import { PrintPreview } from '@/components/PrintPreview';
 import { Minimize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { arrayMove } from '@dnd-kit/sortable';
+import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
 
 const initialScript = `INT. COFFEE SHOP - DAY
 
@@ -65,6 +66,7 @@ const EditorPage = () => {
   const [dataToPrint, setDataToPrint] = useState<PrintData | null>(null);
   const [isDistractionFree, setIsDistractionFree] = useState(false);
   const [currentLang, setCurrentLang] = useState('en-US');
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
@@ -320,6 +322,7 @@ const EditorPage = () => {
             onEnterDistractionFree={() => setIsDistractionFree(true)}
             onLanguageChange={handleLanguageChange}
             onViewChange={setActiveView}
+            onShortcutsClick={() => setIsShortcutsOpen(true)}
           />
         )}
         <div className="flex-1 flex overflow-hidden">
@@ -377,11 +380,11 @@ const EditorPage = () => {
           matchCount={matchCount}
           currentMatchIndex={currentMatchIndex}
           onFindNext={findNext}
-  
           onFindPrevious={findPrevious}
           onReplace={replace}
           onReplaceAll={replaceAll}
         />
+        <KeyboardShortcutsDialog isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
         <UpgradeModal />
       </div>
       <div id="print-container">

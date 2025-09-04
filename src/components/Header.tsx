@@ -13,6 +13,7 @@ interface HeaderProps {
   onEnterDistractionFree: () => void;
   onLanguageChange: (code: string, name: string) => void;
   onViewChange: (view: string) => void;
+  onShortcutsClick: () => void;
 }
 
 export const Header = ({ 
@@ -23,7 +24,8 @@ export const Header = ({
   titlePageContent, 
   onEnterDistractionFree, 
   onLanguageChange,
-  onViewChange
+  onViewChange,
+  onShortcutsClick
 }: HeaderProps) => {
   return (
     <header className="flex items-center justify-between p-2 border-b bg-card text-card-foreground z-10">
@@ -44,6 +46,7 @@ export const Header = ({
           onEnterDistractionFree={onEnterDistractionFree}
           onLanguageChange={onLanguageChange}
           onViewChange={onViewChange}
+          onShortcutsClick={onShortcutsClick}
         />
       </div>
       <div className="flex items-center gap-2">
