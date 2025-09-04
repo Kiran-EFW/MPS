@@ -1,4 +1,4 @@
-import { FileDown, Languages, Globe, Search, Menu, Maximize } from 'lucide-react';
+import { FileDown, Languages, Search, Menu, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -55,10 +55,6 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, title
     showError(`${format} export is a Pro feature. Please upgrade.`);
   };
 
-  const handleTranslate = (lang: string) => {
-    showError(`Translation to ${lang} is a Pro feature. Please upgrade.`);
-  };
-
   return (
     <header className="flex items-center justify-between p-2 border-b bg-card text-card-foreground z-10">
       <div className="flex items-center gap-2">
@@ -83,8 +79,6 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, title
             <DropdownMenuItem onClick={() => handleExport('PDF')}>PDF</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport('Print')}>Print</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleExport('.fdx (Final Draft)')}>.fdx (Final Draft)</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleExport('.celtx (Celtx)')}>.celtx (Celtx)</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport('Fountain')}>Fountain (.fountain)</DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport('Markdown')}>Markdown</DropdownMenuItem>
           </DropdownMenuContent>
@@ -101,17 +95,6 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, title
                 {lang.name}
               </DropdownMenuItem>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Globe className="mr-2 h-4 w-4" /> Translate
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => handleTranslate('Manglish')}>Manglish</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleTranslate('Tamglish')}>Tamglish</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <ThemeToggle />
