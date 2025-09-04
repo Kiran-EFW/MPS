@@ -4,34 +4,35 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { showSuccess, showError } from '@/utils/toast';
 import { exportToMarkdown, exportToFountain } from '@/utils/export';
+import { exportToPdf } from '@/utils/pdfExport';
+import { TitlePageContent } from './TitlePageEditor';
 
 interface HeaderProps {
   onFindClick: () => void;
   onMenuClick?: () => void;
   onPrint: () => void;
   scriptContent: string;
-  scriptTitle: string;
+  titlePageContent: TitlePageContent;
   onEnterDistractionFree: () => void;
 }
 
-export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, scriptTitle, onEnterDistractionFree }: HeaderProps) => {
+export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree }: HeaderProps) => {
   const handleExport = (format: string) => {
     if (format === 'Print') {
       onPrint();
       return;
     }
     if (format === 'PDF') {
-      showSuccess('Exporting to PDF... Use your browser\'s print dialog to "Save as PDF".');
-      onPrint();
+      exportToPdf(scriptContent, titlePageContent);
       return;
     }
     if (format === 'Markdown') {
-      exportToMarkdown(scriptContent, scriptTitle);
+      exportToMarkdown(scriptContent, titlePageContent.title);
       showSuccess('Exporting to Markdown...');
       return;
     }
     if (format === 'Fountain') {
-      exportToFountain(scriptContent, scriptTitle);
+      exportToFountain(scriptContent, titlePageContent.title);
       showSuccess('Exporting to Fountain...');
       return;
     }
