@@ -14,6 +14,7 @@ interface HeaderProps {
   onLanguageChange: (code: string, name: string) => void;
   onViewChange: (view: string) => void;
   onShortcutsClick: () => void;
+  onApplyStyle: (style: 'bold' | 'italic' | 'underline') => void;
 }
 
 export const Header = ({ 
@@ -25,7 +26,8 @@ export const Header = ({
   onEnterDistractionFree, 
   onLanguageChange,
   onViewChange,
-  onShortcutsClick
+  onShortcutsClick,
+  onApplyStyle
 }: HeaderProps) => {
   return (
     <header className="flex items-center justify-between p-2 border-b bg-card text-card-foreground z-10">
@@ -47,6 +49,7 @@ export const Header = ({
           onLanguageChange={onLanguageChange}
           onViewChange={onViewChange}
           onShortcutsClick={onShortcutsClick}
+          onApplyStyle={onApplyStyle}
         />
       </div>
       <div className="flex items-center gap-2">

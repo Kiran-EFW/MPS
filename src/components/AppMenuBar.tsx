@@ -25,6 +25,7 @@ interface AppMenuBarProps {
   onViewChange: (view: string) => void;
   onLanguageChange: (code: string, name: string) => void;
   onShortcutsClick: () => void;
+  onApplyStyle: (style: 'bold' | 'italic' | 'underline') => void;
 }
 
 const languages = [
@@ -42,7 +43,7 @@ const languages = [
   { code: 'de-DE', name: 'German' },
 ];
 
-export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onViewChange, onLanguageChange, onShortcutsClick }: AppMenuBarProps) => {
+export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onViewChange, onLanguageChange, onShortcutsClick, onApplyStyle }: AppMenuBarProps) => {
   const { setTheme } = useTheme();
 
   const handleExport = (format: string) => {
@@ -107,6 +108,10 @@ export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageConte
           <MenubarSeparator />
           <MenubarItem onClick={() => showPlaceholder('Select All')}>Select All <MenubarShortcut>Ctrl+A</MenubarShortcut></MenubarItem>
           <MenubarSeparator />
+          <MenubarItem onClick={() => onApplyStyle('bold')}>Bold <MenubarShortcut>Ctrl+B</MenubarShortcut></MenubarItem>
+          <MenubarItem onClick={() => onApplyStyle('italic')}>Italic <MenubarShortcut>Ctrl+I</MenubarShortcut></MenubarItem>
+          <MenubarItem onClick={() => onApplyStyle('underline')}>Underline <MenubarShortcut>Ctrl+U</MenubarShortcut></MenubarItem>
+          <MenubarSeparator />
           <MenubarItem onClick={onFindClick}>Find & Replace... <MenubarShortcut>Ctrl+F</MenubarShortcut></MenubarItem>
           <MenubarItem onClick={() => showPlaceholder('Find Next')}>Find Next <MenubarShortcut>Ctrl+G</MenubarShortcut></MenubarItem>
           <MenubarItem onClick={() => showPlaceholder('Find Previous')}>Find Previous <MenubarShortcut>Ctrl+Shift+G</MenubarShortcut></MenubarItem>
@@ -143,10 +148,6 @@ export const AppMenuBar = ({ onFindClick, onPrint, scriptContent, titlePageConte
           <MenubarItem onClick={() => showSuccess('Use the format toolbar in the editor view.')}>Parenthetical <MenubarShortcut>Ctrl+5</MenubarShortcut></MenubarItem>
           <MenubarItem onClick={() => showSuccess('Use the format toolbar in the editor view.')}>Transition <MenubarShortcut>Ctrl+6</MenubarShortcut></MenubarItem>
           <MenubarItem onClick={() => showPlaceholder('Shot')}>Shot <MenubarShortcut>Ctrl+7</MenubarShortcut></MenubarItem>
-          <MenubarSeparator />
-          <MenubarItem onClick={() => showPlaceholder('Bold')}>Bold <MenubarShortcut>Ctrl+B</MenubarShortcut></MenubarItem>
-          <MenubarItem onClick={() => showPlaceholder('Italic')}>Italic <MenubarShortcut>Ctrl+I</MenubarShortcut></MenubarItem>
-          <MenubarItem onClick={() => showPlaceholder('Underline')}>Underline <MenubarShortcut>Ctrl+U</MenubarShortcut></MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={() => showPlaceholder('Upper/Lower Case')}>Upper/Lower Case <MenubarShortcut>Ctrl+K</MenubarShortcut></MenubarItem>
           <MenubarItem onClick={() => showPlaceholder('Make Dual Dialogue')}>Make Dual Dialogue <MenubarShortcut>Ctrl+D</MenubarShortcut></MenubarItem>

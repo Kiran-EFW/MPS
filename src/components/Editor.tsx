@@ -17,6 +17,7 @@ interface EditorProps {
   isIndianFormat: boolean;
   setIsIndianFormat: (isIndian: boolean) => void;
   currentLang: string;
+  onApplyStyle: (style: 'bold' | 'italic' | 'underline') => void;
 }
 
 const formats = ['scene', 'action', 'character', 'dialogue', 'parenthetical', 'transition'];
@@ -37,6 +38,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   isIndianFormat,
   setIsIndianFormat,
   currentLang,
+  onApplyStyle,
 }, ref) => {
   const [format, setFormat] = useState('action');
 
@@ -144,6 +146,16 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
           event.preventDefault();
           setFormat(formats[shortcut - 1]);
         }
+
+        let style: 'bold' | 'italic' | 'underline' | null = null;
+        if (event.key === 'b') style = 'bold';
+        if (event.key === 'i') style = 'italic';
+        if (event.key === 'u') style = 'underline';
+
+        if (style) {
+          event.preventDefault();
+          onApplyStyle(style);
+        }
       }
     };
 
@@ -151,7 +163,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [onApplyStyle]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Tab') {

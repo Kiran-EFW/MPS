@@ -158,6 +158,47 @@ const EditorPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const applyStyle = (style: 'bold' | 'italic' | 'underline') => {
+    const textarea = editorRef.current;
+    if (!textarea) {
+      showError('Editor not available to apply style.');
+      return;
+    }
+
+    const { selectionStart, selectionEnd } = textarea;
+    if (selectionStart === selectionEnd) {
+      showError('Please select text to apply a style.');
+      return;
+    }
+
+    const selectedText = scriptContent.substring(selectionStart, selectionEnd);
+    let styledText = '';
+    
+    switch (style) {
+      case 'bold':
+        styledText = `**${selectedText}**`;
+        break;
+      case 'italic':
+        styledText = `*${selectedText}*`;
+        break;
+      case 'underline':
+        styledText = `_${selectedText}_`;
+        break;
+    }
+
+    const newContent =
+      scriptContent.substring(0, selectionStart) +
+      styledText +
+      scriptContent.substring(selectionEnd);
+
+    setScriptContent(newContent);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(selectionStart, selectionStart + styledText.length);
+    }, 0);
+  };
+
   const handleLanguageChange = (code: string, name: string) => {
     setCurrentLang(code);
     showSuccess(`Speech-to-text language changed to ${name}.`);
@@ -293,6 +334,7 @@ const EditorPage = () => {
             isIndianFormat={isIndianFormat}
             setIsIndianFormat={setIsIndianFormat}
             currentLang={currentLang}
+            onApplyStyle={applyStyle}
           />
         );
     }
@@ -325,6 +367,7 @@ const EditorPage = () => {
             onLanguageChange={handleLanguageChange}
             onViewChange={setActiveView}
             onShortcutsClick={() => setIsShortcutsOpen(true)}
+            onApplyStyle={applyStyle}
           />
         )}
         <div className="flex-1 flex overflow-hidden">

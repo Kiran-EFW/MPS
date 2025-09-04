@@ -29,6 +29,9 @@ const shortcuts = [
   { command: 'Format Transition', keys: ['Ctrl', '6'] },
   { command: 'Cycle to Next Format', keys: ['Tab'] },
   { command: 'Cycle to Previous Format', keys: ['Shift', 'Tab'] },
+  { command: 'Bold Text', keys: ['Ctrl', 'B'] },
+  { command: 'Italicize Text', keys: ['Ctrl', 'I'] },
+  { command: 'Underline Text', keys: ['Ctrl', 'U'] },
   { command: 'Find & Replace', keys: ['Ctrl', 'F'] },
   { command: 'Exit Distraction-Free Mode', keys: ['Esc'] },
 ];
