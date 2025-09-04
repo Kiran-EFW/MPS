@@ -43,7 +43,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
 }, ref) => {
   const [format, setFormat] = useState('action');
 
-  const handleFormatChange = (newFormat: string) => {
+  const handleFormatChange = useCallback((newFormat: string) => {
     if (!newFormat) return;
 
     let wasSelectionFormatted = false;
@@ -112,7 +112,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
       // If there was no selection, just set the format the user clicked.
       setFormat(newFormat);
     }
-  };
+  }, [scriptContent, ref, setScriptContent]);
 
   const handleSpeechResult = useCallback((transcript: string) => {
     const textarea = (ref as React.RefObject<HTMLTextAreaElement>)?.current;
@@ -145,7 +145,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
         const shortcut = parseInt(event.key, 10);
         if (shortcut >= 1 && shortcut <= 6) {
           event.preventDefault();
-          setFormat(formats[shortcut - 1]);
+          handleFormatChange(formats[shortcut - 1]);
         }
 
         let style: 'bold' | 'italic' | 'underline' | null = null;
@@ -164,7 +164,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onApplyStyle]);
+  }, [onApplyStyle, handleFormatChange]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Tab') {
