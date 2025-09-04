@@ -185,44 +185,16 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'j') {
-      event.preventDefault();
-      const textarea = event.currentTarget;
-      const { value, selectionStart } = textarea;
-
-      const lineEndIndex = value.indexOf('\n', selectionStart);
-      if (lineEndIndex === -1) return;
-
-      let nextContentStartIndex = lineEndIndex + 1;
-      while (nextContentStartIndex < value.length && /\s/.test(value[nextContentStartIndex])) {
-        nextContentStartIndex++;
-      }
-
-      if (nextContentStartIndex >= value.length) return;
-
-      const nextLineEndIndex = value.indexOf('\n', nextContentStartIndex);
-      const endOfNextLine = nextLineEndIndex === -1 ? value.length : nextLineEndIndex;
-
-      const nextLineText = value.substring(nextContentStartIndex, endOfNextLine);
-      const part1 = value.substring(0, lineEndIndex);
-      const part2 = value.substring(endOfNextLine);
-      const newContent = `${part1} ${nextLineText.trim()}${part2}`;
-      
-      setScriptContent(newContent);
-
-      setTimeout(() => {
-        textarea.focus();
-        const newCursorPos = lineEndIndex + 1;
-        textarea.setSelectionRange(newCursorPos, newCursorPos);
-      }, 0);
-      return;
-    }
-
     if (event.key === 'Tab') {
       event.preventDefault();
       const currentIndex = formats.indexOf(format);
-      const nextIndex = (currentIndex + 1) % formats.length;
-      setFormat(formats[nextIndex]);
+      if (event.shiftKey) {
+        const prevIndex = (currentIndex - 1 + formats.length) % formats.length;
+        setFormat(formats[prevIndex]);
+      } else {
+        const nextIndex = (currentIndex + 1) % formats.length;
+        setFormat(formats[nextIndex]);
+      }
       return;
     }
 
