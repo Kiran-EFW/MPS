@@ -160,7 +160,6 @@
       margin: 0;
     }
     .print-scene {
-      font-weight: bold;
       text-transform: uppercase;
       margin-top: 2em;
       margin-bottom: 1em;
@@ -175,13 +174,13 @@
     }
     .print-dialogue {
       padding-left: 1in;
-      padding-right: 1in;
+      padding-right: 1.5in;
     }
     .print-parenthetical {
       padding-left: 1.6in;
     }
     .print-transition {
-      padding-left: 4.5in;
+      text-align: right;
       text-transform: uppercase;
       margin-top: 1em;
       margin-bottom: 1em;
