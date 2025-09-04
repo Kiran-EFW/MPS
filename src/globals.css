@@ -159,6 +159,8 @@
     .print-contact p {
       margin: 0;
     }
+
+    /* Standard Format */
     .print-scene {
       text-transform: uppercase;
       margin-top: 2em;
@@ -184,6 +186,38 @@
       text-transform: uppercase;
       margin-top: 1em;
       margin-bottom: 1em;
+    }
+
+    /* Indian Cinema Format */
+    .print-indian-body {
+      border-top: 1px solid #000;
+    }
+    .print-indian-row {
+      display: flex;
+      width: 100%;
+      border-bottom: 1px solid #000;
+      page-break-inside: avoid;
+    }
+    .print-indian-left, .print-indian-right {
+      width: 50%;
+      padding: 0.1in 0.2in;
+      min-height: 1.2em;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+    }
+    .print-indian-left {
+      border-right: 1px solid #000;
+    }
+    .print-indian-character {
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .print-indian-dialogue {
+      text-align: left;
+    }
+    .print-indian-transition {
+      text-align: right;
+      text-transform: uppercase;
     }
   }
 }

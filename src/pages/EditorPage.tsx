@@ -55,6 +55,8 @@ const NOTES_STORAGE_KEY = 'mindpaperscreen-notes';
 
 interface PrintData {
   script: string;
+  rightPaneContent: string;
+  isIndianFormat: boolean;
   titlePage: TitlePageContent;
 }
 
@@ -316,7 +318,7 @@ const EditorPage = () => {
           <Header
             onFindClick={() => setIsFindOpen(true)}
             onMenuClick={isMobile ? () => setIsMobileSidebarOpen(true) : undefined}
-            onPrint={() => setDataToPrint({ script: scriptContent, titlePage: titlePageContent })}
+            onPrint={() => setDataToPrint({ script: scriptContent, rightPaneContent, isIndianFormat, titlePage: titlePageContent })}
             scriptContent={scriptContent}
             titlePageContent={titlePageContent}
             onEnterDistractionFree={() => setIsDistractionFree(true)}
@@ -388,7 +390,12 @@ const EditorPage = () => {
         <UpgradeModal />
       </div>
       <div id="print-container">
-        {dataToPrint && <PrintPreview script={dataToPrint.script} titlePage={dataToPrint.titlePage} />}
+        {dataToPrint && <PrintPreview 
+          script={dataToPrint.script} 
+          rightPaneContent={dataToPrint.rightPaneContent}
+          isIndianFormat={dataToPrint.isIndianFormat}
+          titlePage={dataToPrint.titlePage} 
+        />}
       </div>
     </>
   );

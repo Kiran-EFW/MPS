@@ -4,11 +4,46 @@ import { TitlePageContent } from './TitlePageEditor';
 
 interface PrintPreviewProps {
   script: string;
+  rightPaneContent: string;
+  isIndianFormat: boolean;
   titlePage: TitlePageContent;
 }
 
-export const PrintPreview = ({ script, titlePage }: PrintPreviewProps) => {
-  const parsedScript = parseScript(script);
+export const PrintPreview = ({ script, rightPaneContent, isIndianFormat, titlePage }: PrintPreviewProps) => {
+  const renderStandardFormat = () => {
+    const parsedScript = parseScript(script);
+    return (
+      <div className="print-script-body">
+        {parsedScript.map((line, index) => {
+          const className = `print-${line.type}`;
+          if (line.type === 'empty') {
+            return <br key={index} />;
+          }
+          return <div key={index} className={className}>{line.text}</div>;
+        })}
+      </div>
+    );
+  };
+
+  const renderIndianFormat = () => {
+    const leftLines = script.split('\n');
+    const parsedRightLines = parseScript(rightPaneContent);
+    const numRows = Math.max(leftLines.length, parsedRightLines.length);
+    const rows = [];
+
+    for (let i = 0; i < numRows; i++) {
+      const rightLine = parsedRightLines[i];
+      const rightClassName = rightLine ? `print-indian-right print-indian-${rightLine.type}` : 'print-indian-right';
+      
+      rows.push(
+        <div key={i} className="print-indian-row">
+          <div className="print-indian-left">{leftLines[i] || '\u00A0'}</div>
+          <div className={rightClassName}>{rightLine?.text || '\u00A0'}</div>
+        </div>
+      );
+    }
+    return <div className="print-indian-body">{rows}</div>;
+  };
 
   return (
     <div id="print-area">
@@ -24,15 +59,7 @@ export const PrintPreview = ({ script, titlePage }: PrintPreviewProps) => {
           ))}
         </div>
       </div>
-      <div className="print-script-body">
-        {parsedScript.map((line, index) => {
-          const className = `print-${line.type}`;
-          if (line.type === 'empty') {
-            return <br key={index} />;
-          }
-          return <div key={index} className={className}>{line.text}</div>;
-        })}
-      </div>
+      {isIndianFormat ? renderIndianFormat() : renderStandardFormat()}
     </div>
   );
 };

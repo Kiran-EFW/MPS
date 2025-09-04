@@ -8,19 +8,21 @@ export interface ParsedLine {
 export const parseScript = (script: string): ParsedLine[] => {
   const lines = script.split('\n');
   const parsedLines: ParsedLine[] = [];
+  const TRANSITIONS = ['CUT TO', 'DISSOLVE TO', 'FADE IN', 'FADE OUT', 'FADE TO BLACK'];
 
   for (let i = 0; i < lines.length; i++) {
     const text = lines[i];
     const trimmed = text.trim();
+    const trimmedUpper = trimmed.toUpperCase();
     let type: LineType = 'action';
 
     if (trimmed.length === 0) {
       type = 'empty';
-    } else if (trimmed.startsWith('INT.') || trimmed.startsWith('EXT.')) {
+    } else if (trimmedUpper.startsWith('INT.') || trimmedUpper.startsWith('EXT.')) {
       type = 'scene';
     } else if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
       type = 'parenthetical';
-    } else if (trimmed.endsWith(':') && trimmed === trimmed.toUpperCase()) {
+    } else if (TRANSITIONS.some(t => trimmedUpper.startsWith(t)) || (trimmedUpper.endsWith(':') && trimmedUpper.split(' ').length < 4)) {
       type = 'transition';
     } else {
       const nextLine = lines[i + 1]?.trim();
