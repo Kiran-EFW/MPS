@@ -14,9 +14,25 @@ interface HeaderProps {
   scriptContent: string;
   titlePageContent: TitlePageContent;
   onEnterDistractionFree: () => void;
+  onLanguageChange: (code: string, name: string) => void;
 }
 
-export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree }: HeaderProps) => {
+const languages = [
+  { code: 'en-US', name: 'English' },
+  { code: 'ml-IN', name: 'Malayalam' },
+  { code: 'ta-IN', name: 'Tamil' },
+  { code: 'te-IN', name: 'Telugu' },
+  { code: 'hi-IN', name: 'Hindi' },
+  { code: 'kn-IN', name: 'Kannada' },
+  { code: 'ko-KR', name: 'Korean' },
+  { code: 'ar-SA', name: 'Arabic (RTL)' },
+  { code: 'ja-JP', name: 'Japanese' },
+  { code: 'fr-FR', name: 'French' },
+  { code: 'es-ES', name: 'Spanish' },
+  { code: 'de-DE', name: 'German' },
+];
+
+export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, titlePageContent, onEnterDistractionFree, onLanguageChange }: HeaderProps) => {
   const handleExport = (format: string) => {
     if (format === 'Print') {
       onPrint();
@@ -37,10 +53,6 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, title
       return;
     }
     showError(`${format} export is a Pro feature. Please upgrade.`);
-  };
-
-  const handleLanguage = (lang: string) => {
-    showSuccess(`Language changed to ${lang}.`);
   };
 
   const handleTranslate = (lang: string) => {
@@ -84,9 +96,11 @@ export const Header = ({ onFindClick, onMenuClick, onPrint, scriptContent, title
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => handleLanguage('English (LTR)')}>English (LTR)</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleLanguage('Arabic (RTL)')}>Arabic (RTL)</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleLanguage('Hebrew (RTL)')}>Hebrew (RTL)</DropdownMenuItem>
+            {languages.map((lang) => (
+              <DropdownMenuItem key={lang.code} onClick={() => onLanguageChange(lang.code, lang.name)}>
+                {lang.name}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>

@@ -64,6 +64,7 @@ const EditorPage = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [dataToPrint, setDataToPrint] = useState<PrintData | null>(null);
   const [isDistractionFree, setIsDistractionFree] = useState(false);
+  const [currentLang, setCurrentLang] = useState('en-US');
 
   const [scriptContent, setScriptContent] = useState(() => localStorage.getItem(SCRIPT_STORAGE_KEY) || initialScript);
   const [rightPaneContent, setRightPaneContent] = useState(() => localStorage.getItem(RIGHT_PANE_STORAGE_KEY) || '');
@@ -152,6 +153,11 @@ const EditorPage = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  const handleLanguageChange = (code: string, name: string) => {
+    setCurrentLang(code);
+    showSuccess(`Speech-to-text language changed to ${name}.`);
+  };
 
   const handleSearchAndNavigate = (searchTerm: string) => {
     setActiveView('screenplay');
@@ -282,6 +288,7 @@ const EditorPage = () => {
             setRightPaneContent={setRightPaneContent}
             isIndianFormat={isIndianFormat}
             setIsIndianFormat={setIsIndianFormat}
+            currentLang={currentLang}
           />
         );
     }
@@ -311,6 +318,7 @@ const EditorPage = () => {
             scriptContent={scriptContent}
             titlePageContent={titlePageContent}
             onEnterDistractionFree={() => setIsDistractionFree(true)}
+            onLanguageChange={handleLanguageChange}
           />
         )}
         <div className="flex-1 flex overflow-hidden">

@@ -11,7 +11,7 @@ interface SpeechRecognitionHook {
 const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 export const useSpeechRecognition = (
-  { onResult }: { onResult: (transcript: string) => void }
+  { onResult, lang }: { onResult: (transcript: string) => void, lang: string }
 ): SpeechRecognitionHook => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -26,7 +26,7 @@ export const useSpeechRecognition = (
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = false;
-    recognition.lang = 'en-US';
+    recognition.lang = lang;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       const lastResult = event.results[event.results.length - 1];
@@ -54,7 +54,7 @@ export const useSpeechRecognition = (
         recognitionRef.current.stop();
       }
     };
-  }, [hasRecognitionSupport, onResult]);
+  }, [hasRecognitionSupport, onResult, lang]);
 
   const startListening = useCallback(() => {
     if (!hasRecognitionSupport) {

@@ -21,12 +21,15 @@ export default {
       fontFamily: {
         sans: [
           'Noto Sans',
-          'Noto Sans Devanagari', // For Hindi, Marathi
+          'Noto Sans Arabic',
           'Noto Sans Bengali',
-          'Noto Sans Tamil',
-          'Noto Sans Telugu',
+          'Noto Sans Devanagari', // For Hindi, Marathi
+          'Noto Sans JP', // Japanese
+          'Noto Sans KR', // Korean
           'Noto Sans Kannada',
           'Noto Sans Malayalam',
+          'Noto Sans Tamil',
+          'Noto Sans Telugu',
           'sans-serif', // Fallback
         ],
       },

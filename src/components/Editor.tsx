@@ -16,6 +16,7 @@ interface EditorProps {
   setRightPaneContent: (content: string) => void;
   isIndianFormat: boolean;
   setIsIndianFormat: (isIndian: boolean) => void;
+  currentLang: string;
 }
 
 const formats = ['scene', 'action', 'character', 'dialogue', 'parenthetical', 'transition'];
@@ -35,6 +36,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   setRightPaneContent,
   isIndianFormat,
   setIsIndianFormat,
+  currentLang,
 }, ref) => {
   const [format, setFormat] = useState('action');
 
@@ -132,7 +134,7 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
     }
   }, [scriptContent, setScriptContent, ref]);
 
-  const { isListening, startListening, stopListening, hasRecognitionSupport } = useSpeechRecognition({ onResult: handleSpeechResult });
+  const { isListening, startListening, stopListening, hasRecognitionSupport } = useSpeechRecognition({ onResult: handleSpeechResult, lang: currentLang });
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
