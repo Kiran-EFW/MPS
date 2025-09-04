@@ -8,6 +8,7 @@ import { Mic } from 'lucide-react';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { StyledTextarea } from './StyledTextarea';
 
 interface EditorProps {
   scriptContent: string;
@@ -291,10 +292,9 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
             </ResizablePanel>
           </ResizablePanelGroup>
         ) : (
-          <Textarea
+          <StyledTextarea
             ref={ref}
             placeholder="Start writing your screenplay..."
-            className="w-full h-full resize-none text-base font-mono leading-relaxed p-4 rounded-md border"
             value={scriptContent}
             onChange={(e) => setScriptContent(e.target.value)}
             onKeyDown={handleKeyDown}

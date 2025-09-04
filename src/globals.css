@@ -100,6 +100,36 @@
     counter-reset: page;
   }
 
+  /* In-editor screenplay formatting */
+  .editor-line {
+    white-space: pre-wrap;
+    min-height: 1.5rem; /* approx line-height */
+  }
+  .editor-scene {
+    text-transform: uppercase;
+    margin-block: 0.5rem;
+  }
+  .editor-action {
+    /* Base, no extra indent */
+  }
+  .editor-character {
+    padding-left: 20ch;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+  .editor-dialogue {
+    padding-left: 10ch;
+    padding-right: 5ch;
+  }
+  .editor-parenthetical {
+    padding-left: 16ch;
+  }
+  .editor-transition {
+    text-align: right;
+    text-transform: uppercase;
+    margin-block: 0.5rem;
+  }
+
   @page {
     size: 8.5in 11in;
     margin: 1in 1in 1in 1.5in; /* Top, Right, Bottom, Left */
