@@ -198,6 +198,11 @@
       border-bottom: 1px solid #000;
       page-break-inside: avoid;
     }
+    .print-indian-header .print-indian-left,
+    .print-indian-header .print-indian-right {
+      text-align: center;
+      font-weight: bold;
+    }
     .print-indian-left, .print-indian-right {
       width: 50%;
       padding: 0.1in 0.2in;

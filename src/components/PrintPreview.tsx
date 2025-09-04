@@ -31,6 +31,14 @@ export const PrintPreview = ({ script, rightPaneContent, isIndianFormat, titlePa
     const numRows = Math.max(leftLines.length, parsedRightLines.length);
     const rows = [];
 
+    // Add header row
+    rows.push(
+      <div key="header" className="print-indian-row print-indian-header">
+        <div className="print-indian-left">VIDEO</div>
+        <div className="print-indian-right">AUDIO</div>
+      </div>
+    );
+
     for (let i = 0; i < numRows; i++) {
       const rightLine = parsedRightLines[i];
       const rightClassName = rightLine ? `print-indian-right print-indian-${rightLine.type}` : 'print-indian-right';
