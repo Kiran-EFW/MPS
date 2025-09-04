@@ -160,29 +160,33 @@
       margin: 0;
     }
 
-    /* Standard Format */
+    /* Universal Screenplay Format */
     .print-scene {
+      padding-left: 0.8in;
       text-transform: uppercase;
-      margin-top: 2em;
+      margin-top: 1em;
       margin-bottom: 1em;
     }
     .print-action {
       margin-bottom: 1em;
     }
     .print-character {
-      padding-left: 2.2in;
+      padding-left: 2.5in;
       text-transform: uppercase;
       margin-top: 1em;
     }
     .print-dialogue {
-      padding-left: 1in;
-      padding-right: 1.5in;
+      padding-left: 1.3in;
+      padding-right: 0.9in;
+      margin-bottom: 1em;
     }
     .print-parenthetical {
-      padding-left: 1.6in;
+      padding-left: 1.4in;
+      padding-right: 1.4in;
     }
     .print-transition {
       text-align: right;
+      padding-right: 0.5in;
       text-transform: uppercase;
       margin-top: 1em;
       margin-bottom: 1em;
