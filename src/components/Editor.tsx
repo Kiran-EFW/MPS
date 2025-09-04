@@ -41,11 +41,13 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
   const handleFormatChange = (newFormat: string) => {
     if (!newFormat) return;
 
+    let wasSelectionFormatted = false;
     const textarea = (ref as React.RefObject<HTMLTextAreaElement>)?.current;
     if (textarea) {
         const { selectionStart, selectionEnd } = textarea;
 
         if (selectionStart !== selectionEnd) {
+            wasSelectionFormatted = true;
             // There is a selection, so we format it.
             const selectedText = scriptContent.substring(selectionStart, selectionEnd);
             let formattedText = selectedText;
@@ -81,7 +83,30 @@ export const Editor = forwardRef<HTMLTextAreaElement, EditorProps>(({
             }, 0);
         }
     }
-    setFormat(newFormat);
+    
+    if (wasSelectionFormatted) {
+      // If we just formatted a selection, predict the next format.
+      let nextFormat = newFormat;
+      switch (newFormat) {
+        case 'scene':
+          nextFormat = 'action';
+          break;
+        case 'character':
+          nextFormat = 'dialogue';
+          break;
+        case 'dialogue':
+        case 'parenthetical':
+          nextFormat = 'character';
+          break;
+        case 'transition':
+          nextFormat = 'scene';
+          break;
+      }
+      setFormat(nextFormat);
+    } else {
+      // If there was no selection, just set the format the user clicked.
+      setFormat(newFormat);
+    }
   };
 
   const handleSpeechResult = useCallback((transcript: string) => {
